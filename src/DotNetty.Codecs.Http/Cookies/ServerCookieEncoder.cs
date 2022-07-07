@@ -5,7 +5,7 @@ namespace DotNetty.Codecs.Http.Cookies
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Text;
 
@@ -18,6 +18,7 @@ namespace DotNetty.Codecs.Http.Cookies
     // Note that multiple cookies must be sent as separate "Set-Cookie" headers.
     public sealed class ServerCookieEncoder : CookieEncoder
     {
+        static readonly List<string> EMPTY = new List<string>();
         // 
         // Strict encoder that validates that name and value chars are in the valid scope
         // defined in RFC6265, and(for methods that accept multiple cookies) that only
@@ -115,7 +116,7 @@ namespace DotNetty.Codecs.Http.Cookies
         {
             if (cookies == null || cookies.Length == 0)
             {
-                return ImmutableList<string>.Empty;
+                return EMPTY.AsReadOnly();
             }
 
             var encoded = new List<string>(cookies.Length);
@@ -146,7 +147,7 @@ namespace DotNetty.Codecs.Http.Cookies
             Contract.Requires(cookies != null);
             if (cookies.Count == 0)
             {
-                return ImmutableList<string>.Empty;
+                return EMPTY.AsReadOnly();
             }
 
             var encoded = new List<string>();

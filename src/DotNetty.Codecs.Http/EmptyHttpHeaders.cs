@@ -5,12 +5,15 @@ namespace DotNetty.Codecs.Http
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Linq;
     using DotNetty.Common.Utilities;
 
     public class EmptyHttpHeaders : HttpHeaders
     {
+        static readonly HashSet<AsciiString> EMPTY_NAMES = new HashSet<AsciiString>();
+        static readonly List<ICharSequence> EMPTY_VALUES = new List<ICharSequence>();
+        static readonly List<HeaderEntry<AsciiString, ICharSequence>> EMPTY_ENTRIES = new List<HeaderEntry<AsciiString, ICharSequence>>();
         static readonly IEnumerator<HeaderEntry<AsciiString, ICharSequence>> EmptryEnumerator = 
             Enumerable.Empty<HeaderEntry<AsciiString, ICharSequence>>().GetEnumerator();
 
@@ -50,9 +53,9 @@ namespace DotNetty.Codecs.Http
 
         public override long GetTimeMillis(AsciiString name, long defaultValue) => defaultValue;
 
-        public override IList<ICharSequence> GetAll(AsciiString name) => ImmutableList<ICharSequence>.Empty;
+        public override IList<ICharSequence> GetAll(AsciiString name) => EMPTY_VALUES.AsReadOnly();// ImmutableList<ICharSequence>.Empty;
 
-        public override IList<HeaderEntry<AsciiString, ICharSequence>> Entries() => ImmutableList<HeaderEntry<AsciiString, ICharSequence>>.Empty;
+        public override IList<HeaderEntry<AsciiString, ICharSequence>> Entries() => EMPTY_ENTRIES.AsReadOnly();
 
         public override bool Contains(AsciiString name) => false;
 
@@ -60,7 +63,7 @@ namespace DotNetty.Codecs.Http
 
         public override int Size => 0;
 
-        public override ISet<AsciiString> Names() => ImmutableHashSet<AsciiString>.Empty;
+        public override ISet<AsciiString> Names() => EMPTY_NAMES;// ImmutableHashSet<AsciiString>.Empty;
 
         public override HttpHeaders AddInt(AsciiString name, int value) => throw new NotSupportedException("read only");
 

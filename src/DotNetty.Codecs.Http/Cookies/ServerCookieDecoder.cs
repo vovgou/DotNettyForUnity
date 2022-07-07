@@ -4,7 +4,7 @@
 namespace DotNetty.Codecs.Http.Cookies
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using DotNetty.Common.Utilities;
 
@@ -14,7 +14,7 @@ namespace DotNetty.Codecs.Http.Cookies
     // http://tools.ietf.org/html/rfc2965 
     // cookies are still supported,old fields will simply be ignored.
     public sealed class ServerCookieDecoder : CookieDecoder
-    {
+    {       
         static readonly AsciiString RFC2965Version = new AsciiString("$Version");
         static readonly AsciiString RFC2965Path = new AsciiString($"${CookieHeaderNames.Path}");
         static readonly AsciiString RFC2965Domain = new AsciiString($"${CookieHeaderNames.Domain}");
@@ -42,7 +42,7 @@ namespace DotNetty.Codecs.Http.Cookies
             int headerLen = header.Length;
             if (headerLen == 0)
             {
-                return ImmutableHashSet<ICookie>.Empty;
+                return new HashSet<ICookie>();// ImmutableHashSet<ICookie>.Empty;
             }
 
             var cookies = new SortedSet<ICookie>();

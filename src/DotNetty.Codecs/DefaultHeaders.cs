@@ -11,7 +11,7 @@ namespace DotNetty.Codecs
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Runtime.CompilerServices;
     using DotNetty.Common.Utilities;
 
@@ -22,7 +22,7 @@ namespace DotNetty.Codecs
         where TKey : class
     {
         const int HashCodeSeed = unchecked((int)0xc2b2ae35);
-
+        static readonly HashSet<TKey> EMPTY = new HashSet<TKey>();
         static readonly DefaultHashingStrategy<TValue> DefaultValueHashingStrategy = new DefaultHashingStrategy<TValue>();
         static readonly DefaultHashingStrategy<TKey> DefaultKeyHashingStragety = new DefaultHashingStrategy<TKey>();
         static readonly NullNameValidator<TKey> DefaultKeyNameValidator = new NullNameValidator<TKey>();
@@ -189,7 +189,8 @@ namespace DotNetty.Codecs
         {
             if (this.IsEmpty)
             {
-                return ImmutableHashSet<TKey>.Empty;
+                //return ImmutableHashSet<TKey>.Empty;                
+                return EMPTY;
             }
 
             var names = new HashSet<TKey>(this.hashingStrategy);

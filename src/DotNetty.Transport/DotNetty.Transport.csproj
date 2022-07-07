@@ -26,6 +26,11 @@
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Channels\Pool\**" />
+    <EmbeddedResource Remove="Channels\Pool\**" />
+    <None Remove="Channels\Pool\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="..\shared\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

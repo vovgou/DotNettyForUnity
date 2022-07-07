@@ -4,7 +4,7 @@
 namespace DotNetty.Codecs.Redis.Messages
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Text;
     using DotNetty.Common;
@@ -12,6 +12,7 @@ namespace DotNetty.Codecs.Redis.Messages
 
     public sealed class ArrayRedisMessage : AbstractReferenceCounted, IArrayRedisMessage
     {
+        private static readonly List<IRedisMessage> EMPTY = new List<IRedisMessage>();
         public static readonly IArrayRedisMessage Null = new NullArrayRedisMessage();
         public static readonly IArrayRedisMessage Empty = new EmptyArrayRedisMessage();
 
@@ -69,7 +70,7 @@ namespace DotNetty.Codecs.Redis.Messages
 
             public bool Release(int decrement) => false;
 
-            public IList<IRedisMessage> Children => ImmutableList<IRedisMessage>.Empty;
+            public IList<IRedisMessage> Children => EMPTY.AsReadOnly();// ImmutableList<IRedisMessage>.Empty;
 
             public override string ToString() => nameof(NullArrayRedisMessage);
         }
@@ -92,7 +93,7 @@ namespace DotNetty.Codecs.Redis.Messages
 
             public bool Release(int decrement) => false;
 
-            public IList<IRedisMessage> Children => ImmutableList<IRedisMessage>.Empty;
+            public IList<IRedisMessage> Children => EMPTY;//ImmutableList<IRedisMessage>.Empty;
 
             public override string ToString() => nameof(EmptyArrayRedisMessage);
         }

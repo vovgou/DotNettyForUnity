@@ -6,7 +6,7 @@ namespace DotNetty.Codecs.Http.Cors
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using DotNetty.Common.Concurrency;
     using DotNetty.Common.Utilities;
@@ -46,7 +46,7 @@ namespace DotNetty.Codecs.Http.Cors
         CorsConfigBuilder()
         {
             this.anyOrigin = true;
-            this.origins = ImmutableHashSet<ICharSequence>.Empty;
+            this.origins = new HashSet<ICharSequence>();// ImmutableHashSet<ICharSequence>.Empty;
         }
 
         public CorsConfigBuilder AllowNullOrigin()

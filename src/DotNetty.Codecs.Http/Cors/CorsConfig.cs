@@ -7,7 +7,7 @@ namespace DotNetty.Codecs.Http.Cors
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Linq;
     using System.Text;
     using DotNetty.Common.Concurrency;
@@ -53,15 +53,15 @@ namespace DotNetty.Codecs.Http.Cors
 
         public bool IsNullOriginAllowed => this.allowNullOrigin;
 
-        public ISet<ICharSequence> ExposedHeaders() => this.exposeHeaders.ToImmutableHashSet();
+        public ISet<ICharSequence> ExposedHeaders() => this.exposeHeaders; //new ReadOnlyList(this.exposeHeaders);//this.exposeHeaders.ToImmutableHashSet();
 
         public bool IsCredentialsAllowed => this.allowCredentials;
 
         public long MaxAge => this.maxAge;
 
-        public ISet<HttpMethod> AllowedRequestMethods() => this.allowedRequestMethods.ToImmutableHashSet();
+        public ISet<HttpMethod> AllowedRequestMethods() => this.allowedRequestMethods; //this.allowedRequestMethods.ToImmutableHashSet();
 
-        public ISet<AsciiString> AllowedRequestHeaders() => this.allowedRequestHeaders.ToImmutableHashSet();
+        public ISet<AsciiString> AllowedRequestHeaders() => this.allowedRequestHeaders;// this.allowedRequestHeaders.ToImmutableHashSet();
 
         public HttpHeaders PreflightResponseHeaders()
         {

@@ -6,7 +6,7 @@ namespace DotNetty.Common.Internal.Logging
     using System;
     using System.Diagnostics.Contracts;
     using System.Threading;
-    using Microsoft.Extensions.Logging;
+    //using Microsoft.Extensions.Logging;
 
     /// <summary>
     ///     Creates an <see cref="IInternalLogger" /> or changes the default factory
@@ -22,55 +22,57 @@ namespace DotNetty.Common.Internal.Logging
     /// </summary>
     public static class InternalLoggerFactory
     {
-        static ILoggerFactory defaultFactory;
+        //static ILoggerFactory defaultFactory;
 
-        // todo: port: revisit
-        //static InternalLoggerFactory()
+        //// todo: port: revisit
+        ////static InternalLoggerFactory()
+        ////{
+        ////    // Initiate some time-consuming background jobs here,
+        ////    // because this class is often initialized at the earliest time.
+        ////    try
+        ////    {
+        ////        Class.forName(ThreadLocalRandom.class.getName(), true, InternalLoggerFactory.class.getClassLoader());
+        ////    } catch (Exception ignored) {
+        ////        // Should not fail, but it does not harm to fail.
+        ////    }
+        ////}
+
+        //static ILoggerFactory NewDefaultFactory(string name)
         //{
-        //    // Initiate some time-consuming background jobs here,
-        //    // because this class is often initialized at the earliest time.
-        //    try
+        //    var f = new LoggerFactory();
+        //    f.AddProvider(new EventSourceLoggerProvider());
+        //    f.CreateLogger(name).LogDebug("Using EventSource as the default logging framework");
+        //    return f;
+        //}
+
+        ///// <summary>
+        /////     Gets or sets the default factory.
+        ///// </summary>
+        //public static ILoggerFactory DefaultFactory
+        //{
+        //    get
         //    {
-        //        Class.forName(ThreadLocalRandom.class.getName(), true, InternalLoggerFactory.class.getClassLoader());
-        //    } catch (Exception ignored) {
-        //        // Should not fail, but it does not harm to fail.
+        //        ILoggerFactory factory = Volatile.Read(ref defaultFactory);
+        //        if (factory == null)
+        //        {
+        //            factory = NewDefaultFactory(typeof(InternalLoggerFactory).FullName);
+        //            ILoggerFactory current = Interlocked.CompareExchange(ref defaultFactory, factory, null);
+        //            if (current != null)
+        //            {
+        //                return current;
+        //            }
+        //        }
+        //        return factory;
+        //    }
+        //    set
+        //    {
+        //        Contract.Requires(value != null);
+
+        //        Volatile.Write(ref defaultFactory, value);
         //    }
         //}
 
-        static ILoggerFactory NewDefaultFactory(string name)
-        {
-            var f = new LoggerFactory();
-            f.AddProvider(new EventSourceLoggerProvider());
-            f.CreateLogger(name).LogDebug("Using EventSource as the default logging framework");
-            return f;
-        }
-
-        /// <summary>
-        ///     Gets or sets the default factory.
-        /// </summary>
-        public static ILoggerFactory DefaultFactory
-        {
-            get
-            {
-                ILoggerFactory factory = Volatile.Read(ref defaultFactory);
-                if (factory == null)
-                {
-                    factory = NewDefaultFactory(typeof(InternalLoggerFactory).FullName);
-                    ILoggerFactory current = Interlocked.CompareExchange(ref defaultFactory, factory, null);
-                    if (current != null)
-                    {
-                        return current;
-                    }
-                }
-                return factory;
-            }
-            set
-            {
-                Contract.Requires(value != null);
-
-                Volatile.Write(ref defaultFactory, value);
-            }
-        }
+        public static Func<string, IInternalLogger> Factory = name => new EmptyLogger(name);
 
         /// <summary>
         ///     Creates a new logger instance with the name of the specified type.
@@ -91,6 +93,7 @@ namespace DotNetty.Common.Internal.Logging
         /// </summary>
         /// <param name="name">logger name</param>
         /// <returns>logger instance</returns>
-        public static IInternalLogger GetInstance(string name) => new GenericLogger(name, DefaultFactory.CreateLogger(name));
+        //public static IInternalLogger GetInstance(string name) => new GenericLogger(name, DefaultFactory.CreateLogger(name));
+        public static IInternalLogger GetInstance(string name) => Factory(name);
     }
 }

@@ -7,13 +7,14 @@ namespace DotNetty.Codecs.Http
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    //using System.Collections.Immutable;
     using System.Diagnostics.Contracts;
     using System.Text;
     using DotNetty.Common.Utilities;
 
     public class QueryStringDecoder
     {
+        static readonly Dictionary<string, List<string>> EMPTY = new Dictionary<string, List<string>>();
         const int DefaultMaxParams = 1024;
 
         readonly Encoding charset;
@@ -105,7 +106,7 @@ namespace DotNetty.Codecs.Http
             int len = s.Length;
             if (from >= len)
             {
-                return ImmutableDictionary<string, List<string>>.Empty;
+                return EMPTY;// ImmutableDictionary<string, List<string>>.Empty;
             }
             if (s[from] == '?')
             {
