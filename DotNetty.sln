@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F5B1CA65-5852-41C6-9D6F-184A3889237B}"
 	ProjectSection(SolutionItems) = preProject
@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{126EA539-4B28-4B07-8B5D-D1D7F794D189}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{541093F6-616E-43D9-B671-FCD1F9C0A181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetty.Unity", "src\DotNetty.Unity\DotNetty.Unity.csproj", "{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetty.Common", "src\DotNetty.Common\DotNetty.Common.csproj", "{DF4FF0D0-A5CE-471F-B946-538C28C21CBB}"
 EndProject
@@ -105,7 +107,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetty.Codecs.Http.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSockets.Server", "examples\WebSockets.Server\WebSockets.Server.csproj", "{EA387B4B-DAD0-4E34-B8A3-79EA4616726A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSockets.Client", "examples\WebSockets.Client\WebSockets.Client.csproj", "{3326DB6E-023E-483F-9A1C-5905D3091B57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSockets.Client", "examples\WebSockets.Client\WebSockets.Client.csproj", "{3326DB6E-023E-483F-9A1C-5905D3091B57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -285,6 +287,10 @@ Global
 		{3326DB6E-023E-483F-9A1C-5905D3091B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3326DB6E-023E-483F-9A1C-5905D3091B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3326DB6E-023E-483F-9A1C-5905D3091B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -333,9 +339,10 @@ Global
 		{16C89E7C-1575-4685-8DFA-8E7E2C6101BF} = {541093F6-616E-43D9-B671-FCD1F9C0A181}
 		{EA387B4B-DAD0-4E34-B8A3-79EA4616726A} = {F716F1EF-81EF-4020-914A-5422A13A9E13}
 		{3326DB6E-023E-483F-9A1C-5905D3091B57} = {F716F1EF-81EF-4020-914A-5422A13A9E13}
+		{CF83C578-7DFE-4AC0-935F-8F9C9B7A8639} = {126EA539-4B28-4B07-8B5D-D1D7F794D189}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		{9FE6A783-C20D-4097-9988-4178E2C4CE75} = {126EA539-4B28-4B07-8B5D-D1D7F794D189}
 		SolutionGuid = {1FBD8DF1-D90A-4F21-8EB6-DA17B9431FE3}
+		{9FE6A783-C20D-4097-9988-4178E2C4CE75} = {126EA539-4B28-4B07-8B5D-D1D7F794D189}
 	EndGlobalSection
 EndGlobal

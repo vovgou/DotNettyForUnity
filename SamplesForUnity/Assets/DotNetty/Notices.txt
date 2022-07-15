@@ -1,0 +1,15 @@
+Notice
+
+This asset is governed by the Asset Store EULA; however, the following components are governed by the licenses indicated below:
+
+A. DotNetty
+
+MIT
+
+license and copyright/accreditation details¡ªdetermined by relevant license
+
+B. DotNettyForUnity
+
+MIT
+
+license and copyright/accreditation details¡ªdetermined by relevant license

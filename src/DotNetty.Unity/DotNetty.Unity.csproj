@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup Label="NuGet">
+		<TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Unity3D.SDK" Version="2018.4.11.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DotNetty.Common\DotNetty.Common.csproj" />
+	</ItemGroup>
+
+</Project>
