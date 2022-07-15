@@ -1,7 +1,7 @@
 # DotNetty For Unity
 
 [![release](https://img.shields.io/github/v/tag/vovgou/DotNettyForUnity?label=release)](https://github.com/vovgou/DotNettyForUnity/releases)
-[![npm](https://img.shields.io/npm/v/dotnetty)](https://www.npmjs.com/package/dotnetty)
+[![npm](https://img.shields.io/npm/v/com.vovgou.dotnetty)](https://www.npmjs.com/package/com.vovgou.dotnetty)
 
 DotNetty is a port of [Netty](https://github.com/netty/netty), asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.
 
