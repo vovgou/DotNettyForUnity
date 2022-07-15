@@ -7,10 +7,49 @@ DotNetty is a port of [Netty](https://github.com/netty/netty), asynchronous even
 
 This version is modified based on [DotNetty](https://github.com/Azure/DotNetty)'s 0.7.2 version and is a customized version for the Unity development platform. It removes some dependent libraries and passes the test under IL2CPP.
 
-## Use
+## Installation
 
-* Official releases are on [NuGet](https://www.nuget.org/packages?q=DotNetty).
-* Nightly builds are available on [MyGet](https://www.myget.org/F/dotnetty/api/v2/).
+### Install via OpenUPM 
+
+Modify the Packages/manifest.json file in your unity project, add the third-party repository "package.openupm.com"'s configuration and add "com.vovgou.dotnetty" in the "dependencies" node.
+
+    {
+      "dependencies": {
+        ...
+        "com.unity.modules.xr": "1.0.0",
+        "com.vovgou.dotnetty": "0.7.2"
+      },
+      "scopedRegistries": [
+        {
+          "name": "package.openupm.com",
+          "url": "https://package.openupm.com",
+          "scopes": [
+            "com.vovgou"
+          ]
+        }
+      ]
+    }
+
+### Install via NPM 
+
+Modify the Packages/manifest.json file in your unity project, add the third-party repository "npmjs.org"'s configuration and add "com.vovgou.dotnetty" in the "dependencies" node.
+
+    {
+      "dependencies": {
+        ...
+        "com.unity.modules.xr": "1.0.0",
+        "com.vovgou.dotnetty": "0.7.2"
+      },
+      "scopedRegistries": [
+        {
+          "name": "npmjs.org",
+          "url": "https://registry.npmjs.org/",
+          "scopes": [
+            "com.vovgou"
+          ]
+        }
+      ]
+    }
 
 ## Contribute
 
