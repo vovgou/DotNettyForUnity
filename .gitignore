@@ -38,3 +38,5 @@ nuget.exe
 .dotnet/
 DotNetty.*.nuget.targets
 *.exe
+/SamplesForUnity/Library
+/SamplesForUnity/Temp

@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Unity3D.SDK" Version="2018.4.11.1" />
+	  <PackageReference Include="Unity3D.SDK" Version="2018.4.11.1" />
 	</ItemGroup>
 
 	<ItemGroup>

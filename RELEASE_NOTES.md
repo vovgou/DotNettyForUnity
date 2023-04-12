@@ -1,3 +1,14 @@
+#### 0.7.5 August 31, 2022
+- Fix infinite loop caused by TlsHandler
+
+#### 0.7.4 August 04, 2022
+- target fix: net5 -> net5.0, net6 -> net6.0
+
+#### 0.7.3 July 28, 2022
+- target net5 and net6
+- Adopted TlsHandler for the case when Handshake completion callback is dispatched asynchronously to thread pool
+- Introduced SingleThreadedEmbededChannel for TlsHandler and SniHandler tests 
+
 #### 0.7.2 February 14, 2022
 - Start threads as background in HashedWheelTimer, LoopExecutor, ThreadDeathWatcher
 - Google.Protobuf 3.19.4 (latest) 
