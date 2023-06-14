@@ -1235,7 +1235,7 @@
         <member name="M:DotNetty.Buffers.IByteBuffer.ReadBytes(DotNetty.Buffers.IByteBuffer)">
             <summary>
                 Transfers bytes from this buffer's data into the specified destination buffer
-                starting at the curent <see cref="P:DotNetty.Buffers.IByteBuffer.ReaderIndex" /> until the destination becomes
+                starting at the current <see cref="P:DotNetty.Buffers.IByteBuffer.ReaderIndex" /> until the destination becomes
                 non-writable and increases the <see cref="P:DotNetty.Buffers.IByteBuffer.ReaderIndex" /> by the number of transferred bytes.
             </summary>
             <exception cref="T:System.IndexOutOfRangeException">
@@ -1549,10 +1549,10 @@
             Return the number of active bytes that are currently allocated by the arena.
         </member>
         <member name="P:DotNetty.Buffers.IPoolChunkListMetric.MinUsage">
-            Return the minum usage of the chunk list before which chunks are promoted to the previous list.
+            Return the minimum usage of the chunk list before which chunks are promoted to the previous list.
         </member>
         <member name="P:DotNetty.Buffers.IPoolChunkListMetric.MaxUsage">
-            Return the minum usage of the chunk list after which chunks are promoted to the next list.
+            Return the maximum usage of the chunk list after which chunks are promoted to the next list.
         </member>
         <member name="P:DotNetty.Buffers.IPoolChunkMetric.Usage">
             Return the percentage of the current usage of the chunk.

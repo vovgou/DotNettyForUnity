@@ -1045,6 +1045,114 @@
                 A dummy <see cref="T:DotNetty.Transport.Channels.IChannelId" /> implementation
             </summary>
         </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.#ctor(DotNetty.Transport.Channels.IEventLoop)">
+            <summary>
+                Create a new instance with an empty pipeline.
+            </summary>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.#ctor(DotNetty.Transport.Channels.IChannelId,DotNetty.Transport.Channels.IEventLoop)">
+            <summary>
+                Create a new instance with an empty pipeline with the specified <see cref="T:DotNetty.Transport.Channels.IChannelId" />.
+            </summary>
+            <param name="channelId">The <see cref="T:DotNetty.Transport.Channels.IChannelId" /> of this channel. </param>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.#ctor(DotNetty.Transport.Channels.IEventLoop,DotNetty.Transport.Channels.IChannelHandler[])">
+            <summary>
+                Create a new instance with the pipeline initialized with the specified handlers.
+            </summary>
+            <param name="handlers">
+                The <see cref="T:DotNetty.Transport.Channels.IChannelHandler" />s that will be added to the <see cref="T:DotNetty.Transport.Channels.IChannelPipeline" />
+            </param>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.#ctor(DotNetty.Transport.Channels.IChannelId,System.Boolean,DotNetty.Transport.Channels.IEventLoop,DotNetty.Transport.Channels.IChannelHandler[])">
+            <summary>Create a new instance with the pipeline initialized with the specified handlers.</summary>
+            <param name="id">The <see cref="T:DotNetty.Transport.Channels.IChannelId" /> of this channel.</param>
+            <param name="hasDisconnect">
+                <c>false</c> if this <see cref="T:DotNetty.Transport.Channels.IChannel" /> will delegate <see cref="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.DisconnectAsync" />
+                to <see cref="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.CloseAsync" />, <c>true</c> otherwise.
+            </param>
+            <param name="handlers">
+                The <see cref="T:DotNetty.Transport.Channels.IChannelHandler" />s that will be added to the <see cref="T:DotNetty.Transport.Channels.IChannelPipeline" />
+            </param>
+        </member>
+        <member name="P:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.InboundMessages">
+            <summary>
+                Returns the <see cref="T:System.Collections.Generic.Queue`1" /> which holds all of the <see cref="T:System.Object" />s that
+                were received by this <see cref="T:DotNetty.Transport.Channels.IChannel" />.
+            </summary>
+        </member>
+        <member name="P:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.OutboundMessages">
+            <summary>
+                Returns the <see cref="T:System.Collections.Generic.Queue`1" /> which holds all of the <see cref="T:System.Object" />s that
+                were written by this <see cref="T:DotNetty.Transport.Channels.IChannel" />.
+            </summary>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.ReadInbound``1">
+            <summary>
+            Return received data from this <see cref="T:DotNetty.Transport.Channels.IChannel"/>.
+            </summary>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.ReadOutbound``1">
+            <summary>
+            Read data from the outbound. This may return <c>null</c> if nothing is readable.
+            </summary>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.WriteInbound(System.Object[])">
+            <summary>
+                Write messages to the inbound of this <see cref="T:DotNetty.Transport.Channels.IChannel" />
+            </summary>
+            <param name="msgs">The messages to be written.</param>
+            <returns><c>true</c> if the write operation did add something to the inbound buffer</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.WriteOutbound(System.Object[])">
+            <summary>
+                Write messages to the outbound of this <see cref="T:DotNetty.Transport.Channels.IChannel" />.
+            </summary>
+            <param name="msgs">The messages to be written.</param>
+            <returns><c>true</c> if the write operation did add something to the inbound buffer</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.Finish">
+            <summary>
+                Mark this <see cref="T:DotNetty.Transport.Channels.IChannel" /> as finished. Any further try to write data to it will fail.
+            </summary>
+            <returns>bufferReadable returns <c>true</c></returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.FinishAndReleaseAll">
+            <summary>
+            Marks this <see cref="T:DotNetty.Transport.Channels.IChannel"/> as finished and releases all pending message in the inbound and outbound
+            buffer. Any futher try to write data to it will fail.
+            </summary>
+            <returns><c>true</c> if any of the used buffers has something left to read, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.Finish(System.Boolean)">
+            <summary>
+            Marks this <see cref="T:DotNetty.Transport.Channels.IChannel"/> as finished. Any futher attempt to write data to it will fail.
+            </summary>
+            <param name="releaseAll">If <c>true</c>, all pending messages in the inbound and outbound buffer are released.</param>
+            <returns><c>true</c> if any of the used buffers has something left to read, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.ReleaseInbound">
+            <summary>
+            Releases all buffered inbound messages.
+            </summary>
+            <returns><c>true</c> if any were in the inbound buffer, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.ReleaseOutbound">
+            <summary>
+            Releases all buffered outbound messages.
+            </summary>
+            <returns><c>true</c> if any were in the outbound buffer, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.CheckException">
+            <summary>
+                Check to see if there was any <see cref="T:System.Exception" /> and rethrow if so.
+            </summary>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Embedded.SingleThreadedEmbeddedChannel.EnsureOpen">
+            <summary>
+                Ensure the <see cref="T:DotNetty.Transport.Channels.IChannel" /> is open and if not throw an exception.
+            </summary>
+        </member>
         <member name="T:DotNetty.Transport.Channels.FixedRecvByteBufAllocator">
             <summary>
                 The <see cref="T:DotNetty.Transport.Channels.IRecvByteBufAllocator" /> that always yields the same buffer

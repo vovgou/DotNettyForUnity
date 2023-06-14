@@ -528,7 +528,7 @@
                 use secure and the other plain connection.
             </summary>
         </member>
-        <member name="M:DotNetty.Handlers.Tls.TlsHandler.Unwrap(DotNetty.Transport.Channels.IChannelHandlerContext,DotNetty.Buffers.IByteBuffer,System.Int32,System.Int32,System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{System.Object})">
+        <member name="M:DotNetty.Handlers.Tls.TlsHandler.Unwrap(DotNetty.Transport.Channels.IChannelHandlerContext,DotNetty.Buffers.IByteBuffer,System.Int32,System.Int32,System.Collections.Generic.List{System.ValueTuple{System.Int32,System.Byte}},System.Collections.Generic.List{System.Object})">
             <summary>Unwraps inbound SSL records.</summary>
         </member>
         <member name="M:DotNetty.Handlers.Tls.TlsHandshakeCompletionEvent.#ctor">
@@ -571,7 +571,7 @@
         <member name="F:DotNetty.Handlers.Tls.TlsUtils.SSL_RECORD_HEADER_LENGTH">
             the length of the ssl record header (in bytes)
         </member>
-        <member name="M:DotNetty.Handlers.Tls.TlsUtils.GetEncryptedPacketLength(DotNetty.Buffers.IByteBuffer,System.Int32)">
+        <member name="M:DotNetty.Handlers.Tls.TlsUtils.GetEncryptedPacketLength(DotNetty.Buffers.IByteBuffer,System.Int32,System.Byte@)">
             <summary>
                 Return how much bytes can be read out of the encrypted data. Be aware that this method will not increase
                 the readerIndex of the given <see cref="T:DotNetty.Buffers.IByteBuffer"/>.

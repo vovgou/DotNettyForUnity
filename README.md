@@ -5,7 +5,7 @@
 
 DotNetty is a port of [Netty](https://github.com/netty/netty), asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.
 
-This version is modified based on [DotNetty](https://github.com/Azure/DotNetty)'s 0.7.2 version and is a customized version for the Unity development platform. It removes some dependencies and has been tested under IL2CPP.
+This version is modified based on [DotNetty](https://github.com/Azure/DotNetty)'s 0.7.5 version and is a customized version for the Unity development platform. It removes some dependencies and has been tested under IL2CPP.
 
 ## Installation
 
@@ -17,7 +17,7 @@ Modify the Packages/manifest.json file in your unity project, add the third-part
       "dependencies": {
         ...
         "com.unity.modules.xr": "1.0.0",
-        "com.vovgou.dotnetty": "0.7.2"
+        "com.vovgou.dotnetty": "0.7.5"
       },
       "scopedRegistries": [
         {
@@ -38,7 +38,7 @@ Modify the Packages/manifest.json file in your unity project, add the third-part
       "dependencies": {
         ...
         "com.unity.modules.xr": "1.0.0",
-        "com.vovgou.dotnetty": "0.7.2"
+        "com.vovgou.dotnetty": "0.7.5"
       },
       "scopedRegistries": [
         {
