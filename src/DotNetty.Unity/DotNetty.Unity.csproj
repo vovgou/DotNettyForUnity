@@ -3,6 +3,18 @@
 
 	<PropertyGroup Label="NuGet">
 		<TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+		<IsPackable>true</IsPackable>
+		<PackageId>DotNetty.Unity</PackageId>
+		<Description>DotNetty Unity</Description>
+		<Copyright>© Clark Yang. All rights reserved.</Copyright>
+		<AssemblyTitle>DotNetty: unity</AssemblyTitle>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<VersionPrefix>0.7.5</VersionPrefix>
+		<Authors>Clark</Authors>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>DotNetty.Unity</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
