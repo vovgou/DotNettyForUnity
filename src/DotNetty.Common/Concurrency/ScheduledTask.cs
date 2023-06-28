@@ -25,7 +25,7 @@ namespace DotNetty.Common.Concurrency
             this.Deadline = deadline;
         }
 
-        public PreciseTimeSpan Deadline { get; }
+        public PreciseTimeSpan Deadline { get; protected set; }
 
         public bool Cancel()
         {
@@ -72,7 +72,7 @@ namespace DotNetty.Common.Concurrency
 
         protected abstract void Execute();
 
-        bool TrySetUncancelable() => this.AtomicCancellationStateUpdate(CancellationProhibited, CancellationRequested);
+        protected bool TrySetUncancelable() => this.AtomicCancellationStateUpdate(CancellationProhibited, CancellationRequested);
 
         bool AtomicCancellationStateUpdate(int newBits, int illegalBits)
         {

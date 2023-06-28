@@ -318,6 +318,42 @@
                 <para>Threading specifics are determined by <c>IEventExecutor</c> implementation.</para>
             </remarks>
         </member>
+        <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleAtFixedRate(System.Action,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="initialDelay"></param>
+            <param name="period"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleAtFixedRate(DotNetty.Common.Concurrency.IRunnable,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="initialDelay"></param>
+            <param name="period"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleWithFixedDelay(System.Action,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="initialDelay"></param>
+            <param name="delay"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleWithFixedDelay(DotNetty.Common.Concurrency.IRunnable,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            
+            </summary>
+            <param name="action"></param>
+            <param name="initialDelay"></param>
+            <param name="delay"></param>
+            <returns></returns>
+        </member>
         <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleAsync(System.Action{System.Object},System.Object,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
                 Schedules the given action for execution after the specified delay would pass.

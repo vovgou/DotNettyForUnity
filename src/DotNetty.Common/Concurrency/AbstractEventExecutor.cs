@@ -133,5 +133,25 @@ namespace DotNetty.Common.Concurrency
                 Logger.Warn("A task raised an exception. Task: {}", task, ex);
             }
         }
+
+        public virtual IScheduledTask ScheduleAtFixedRate(Action action, TimeSpan initialDelay, TimeSpan period)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual IScheduledTask ScheduleAtFixedRate(IRunnable action, TimeSpan initialDelay, TimeSpan period)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual IScheduledTask ScheduleWithFixedDelay(Action action, TimeSpan initialDelay, TimeSpan delay)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual IScheduledTask ScheduleWithFixedDelay(IRunnable action, TimeSpan initialDelay, TimeSpan delay)
+        {
+            throw new NotSupportedException();
+        }
     }
 }
