@@ -72,7 +72,7 @@ namespace DotNetty.Common.Concurrency
 
         protected abstract void Execute();
 
-        protected bool TrySetUncancelable() => this.AtomicCancellationStateUpdate(CancellationProhibited, CancellationRequested);
+        bool TrySetUncancelable() => this.AtomicCancellationStateUpdate(CancellationProhibited, CancellationRequested);
 
         bool AtomicCancellationStateUpdate(int newBits, int illegalBits)
         {

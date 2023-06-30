@@ -126,14 +126,14 @@ namespace DotNetty.Common.Concurrency
         {
             Contract.Requires(action != null);
 
-            return this.Schedule(new RepeatedScheduledTask(this,action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(period), true));
+            return this.Schedule(new FixedRateScheduledTask(this,action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(period)));
         }
 
         public override IScheduledTask ScheduleAtFixedRate(IRunnable action, TimeSpan initialDelay, TimeSpan period)
         {
             Contract.Requires(action != null);
 
-            return this.Schedule(new RepeatedScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(period), true));
+            return this.Schedule(new FixedRateScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(period)));
 
         }
 
@@ -141,14 +141,14 @@ namespace DotNetty.Common.Concurrency
         {
             Contract.Requires(action != null);
 
-            return this.Schedule(new RepeatedScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(delay), false));
+            return this.Schedule(new FixedDelayScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(delay)));
         }
 
         public override IScheduledTask ScheduleWithFixedDelay(IRunnable action, TimeSpan initialDelay, TimeSpan delay)
         {
             Contract.Requires(action != null);
 
-            return this.Schedule(new RepeatedScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(delay), false));
+            return this.Schedule(new FixedDelayScheduledTask(this, action, PreciseTimeSpan.Deadline(initialDelay), PreciseTimeSpan.FromTimeSpan(delay)));
         }
 
         public override Task ScheduleAsync(Action action, TimeSpan delay, CancellationToken cancellationToken)
@@ -198,7 +198,7 @@ namespace DotNetty.Common.Concurrency
             return this.Schedule(new StateActionWithContextScheduledAsyncTask(this, action, context, state, PreciseTimeSpan.Deadline(delay), cancellationToken)).Completion;
         }
 
-        protected internal IScheduledRunnable Schedule(IScheduledRunnable task)
+        internal IScheduledRunnable Schedule(IScheduledRunnable task)
         {
             if (this.InEventLoop)
             {
