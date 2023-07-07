@@ -46,7 +46,7 @@ namespace DotNetty.Common.Concurrency
         IScheduledTask Schedule(Action<object, object> action, object context, object state, TimeSpan delay);
 
         /// <summary>
-        /// 
+        ///     Schedules the given action for execution at a fixed frequency after the specified delay would pass.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="initialDelay"></param>
@@ -55,7 +55,7 @@ namespace DotNetty.Common.Concurrency
         IScheduledTask ScheduleAtFixedRate(Action action, TimeSpan initialDelay, TimeSpan period);
 
         /// <summary>
-        /// 
+        ///     Schedules the given action for execution at a fixed frequency after the specified delay would pass.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="initialDelay"></param>
@@ -64,7 +64,7 @@ namespace DotNetty.Common.Concurrency
         IScheduledTask ScheduleAtFixedRate(IRunnable action, TimeSpan initialDelay, TimeSpan period);
 
         /// <summary>
-        /// 
+        ///     Schedules the given action for execution at a fixed delay after the specified delay would pass.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="initialDelay"></param>
@@ -73,7 +73,7 @@ namespace DotNetty.Common.Concurrency
         IScheduledTask ScheduleWithFixedDelay(Action action, TimeSpan initialDelay, TimeSpan delay);
 
         /// <summary>
-        /// 
+        ///     Schedules the given action for execution at a fixed delay after the specified delay would pass.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="initialDelay"></param>

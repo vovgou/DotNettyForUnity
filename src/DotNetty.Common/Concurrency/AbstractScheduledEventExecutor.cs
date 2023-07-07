@@ -98,6 +98,9 @@ namespace DotNetty.Common.Concurrency
         {
             Contract.Requires(action != null);
 
+            if(action is ReusableScheduledTask task)
+                return this.Schedule(task.Reset(this, PreciseTimeSpan.Deadline(delay)));//Optimize GC.by Clark
+
             return this.Schedule(new RunnableScheduledTask(this, action, PreciseTimeSpan.Deadline(delay)));
         }
 

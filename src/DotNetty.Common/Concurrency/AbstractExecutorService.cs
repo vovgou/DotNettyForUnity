@@ -4,11 +4,19 @@
 namespace DotNetty.Common.Concurrency
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Threading;
     using System.Threading.Tasks;
 
     public abstract class AbstractExecutorService : IExecutorService
     {
+        private const int POOL_CAPACITY = 128;
+        private ActionTaskQueueNodePool actionTaskQueueNodeFactory = new ActionTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+
+        private StateActionTaskQueueNodePool stateActionTaskQueueNodeFactory = new StateActionTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+
+        private StateActionWithContextTaskQueueNodePool stateActionWithContextTaskQueueNodeFactory = new StateActionWithContextTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+
         /// <inheritdoc cref="IExecutorService"/>
         public abstract bool IsShutdown { get; }
 
@@ -57,56 +65,199 @@ namespace DotNetty.Common.Concurrency
         public abstract void Execute(IRunnable task);
 
         /// <inheritdoc cref="IExecutor"/>
-        public void Execute(Action<object> action, object state) => this.Execute(new StateActionTaskQueueNode(action, state));
+        public void Execute(Action<object> action, object state) => this.Execute(stateActionTaskQueueNodeFactory.Allocate(action, state));
 
         /// <inheritdoc cref="IExecutor"/>
-        public void Execute(Action<object, object> action, object context, object state) => this.Execute(new StateActionWithContextTaskQueueNode(action, context, state));
+        public void Execute(Action<object, object> action, object context, object state) => this.Execute(stateActionWithContextTaskQueueNodeFactory.Allocate(action, context, state));
 
         /// <inheritdoc cref="IExecutor"/>
-        public void Execute(Action action) => this.Execute(new ActionTaskQueueNode(action));
+        public void Execute(Action action) => this.Execute(actionTaskQueueNodeFactory.Allocate(action));
 
         #region Queuing data structures
 
-        sealed class ActionTaskQueueNode : IRunnable
+        //Use object pool to optimize GC. by Clark
+        sealed class ActionTaskQueueNodePool
         {
-            readonly Action action;
-
-            public ActionTaskQueueNode(Action action)
+            private int capacity;
+            private ConcurrentQueue<ActionTaskQueueNode> queue;
+            public ActionTaskQueueNodePool(int capacity)
             {
-                this.action = action;
+                this.capacity = capacity;
+                this.queue = new ConcurrentQueue<ActionTaskQueueNode>();
             }
 
-            public void Run() => this.action();
+            public ActionTaskQueueNode Allocate(Action action)
+            {
+                ActionTaskQueueNode task;
+                if (!queue.TryDequeue(out task))
+                    task = new ActionTaskQueueNode(this);
+                task.action = action;
+                return task;
+            }
+
+            public void Free(ActionTaskQueueNode task)
+            {
+                if (queue.Count >= capacity)
+                    return;
+
+                task.action = null;
+                queue.Enqueue(task);
+            }
+        }
+
+        sealed class ActionTaskQueueNode : IRunnable
+        {
+            private readonly ActionTaskQueueNodePool pool;
+            public Action action;
+
+            public ActionTaskQueueNode(ActionTaskQueueNodePool pool)
+            {
+                this.pool = pool;
+            }
+
+            //public ActionTaskQueueNode(Action action)
+            //{
+            //    this.action = action;
+            //}
+
+            public void Run()
+            {
+                try
+                {
+                    this.action();
+                }
+                finally
+                {
+                    this.pool.Free(this);
+                }
+            }
+        }
+
+        //Use object pool to optimize GC. by Clark
+        sealed class StateActionTaskQueueNodePool
+        {
+            private int capacity;
+            private ConcurrentQueue<StateActionTaskQueueNode> queue;
+            public StateActionTaskQueueNodePool(int capacity)
+            {
+                this.capacity = capacity;
+                this.queue = new ConcurrentQueue<StateActionTaskQueueNode>();
+            }
+
+            public StateActionTaskQueueNode Allocate(Action<object> action, object state)
+            {
+                StateActionTaskQueueNode task;
+                if (!queue.TryDequeue(out task))
+                    task = new StateActionTaskQueueNode(this);
+                task.action = action;
+                task.state = state;
+                return task;
+            }
+
+            public void Free(StateActionTaskQueueNode task)
+            {
+                if (queue.Count >= capacity)
+                    return;
+
+                task.action = null;
+                task.state = null;
+                queue.Enqueue(task);
+            }
         }
 
         sealed class StateActionTaskQueueNode : IRunnable
         {
-            readonly Action<object> action;
-            readonly object state;
+            private readonly StateActionTaskQueueNodePool pool;
+            public Action<object> action;
+            public object state;
 
-            public StateActionTaskQueueNode(Action<object> action, object state)
+            public StateActionTaskQueueNode(StateActionTaskQueueNodePool pool)
             {
-                this.action = action;
-                this.state = state;
+                this.pool = pool;
             }
 
-            public void Run() => this.action(this.state);
+            //public StateActionTaskQueueNode(Action<object> action, object state)
+            //{
+            //    this.action = action;
+            //    this.state = state;
+            //}
+
+            public void Run()
+            {
+                try
+                {
+                    this.action(this.state);
+                }
+                finally
+                {
+                    this.pool.Free(this);
+                }
+            }
+        }
+
+        //Use object pool to optimize GC. by Clark
+        sealed class StateActionWithContextTaskQueueNodePool
+        {
+            private int capacity;
+            private ConcurrentQueue<StateActionWithContextTaskQueueNode> queue;
+            public StateActionWithContextTaskQueueNodePool(int capacity)
+            {
+                this.capacity = capacity;
+                this.queue = new ConcurrentQueue<StateActionWithContextTaskQueueNode>();
+            }
+
+            public StateActionWithContextTaskQueueNode Allocate(Action<object, object> action, object context, object state)
+            {
+                StateActionWithContextTaskQueueNode task;
+                if (!queue.TryDequeue(out task))
+                    task = new StateActionWithContextTaskQueueNode(this);
+                task.action = action;
+                task.context = context;
+                task.state = state;
+                return task;
+            }
+
+            public void Free(StateActionWithContextTaskQueueNode task)
+            {
+                if (queue.Count >= capacity)
+                    return;
+
+                task.action = null;
+                task.context = null;
+                task.state = null;
+                queue.Enqueue(task);
+            }
         }
 
         sealed class StateActionWithContextTaskQueueNode : IRunnable
         {
-            readonly Action<object, object> action;
-            readonly object context;
-            readonly object state;
+            private readonly StateActionWithContextTaskQueueNodePool pool;
+            public Action<object, object> action;
+            public object context;
+            public object state;
 
-            public StateActionWithContextTaskQueueNode(Action<object, object> action, object context, object state)
+            public StateActionWithContextTaskQueueNode(StateActionWithContextTaskQueueNodePool pool)
             {
-                this.action = action;
-                this.context = context;
-                this.state = state;
+                this.pool = pool;
             }
+            //public StateActionWithContextTaskQueueNode(Action<object, object> action, object context, object state)
+            //{
+            //    this.action = action;
+            //    this.context = context;
+            //    this.state = state;
+            //}
 
-            public void Run() => this.action(this.context, this.state);
+            public void Run()
+            {
+                try
+                {
+                    this.action(this.context, this.state);
+                }
+                finally
+                {
+                    this.pool.Free(this);
+                }
+            }
         }
 
         abstract class FuncQueueNodeBase<T> : IRunnable
