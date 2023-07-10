@@ -17,9 +17,9 @@ namespace DotNetty.Common.Concurrency
         const int CancellationProhibited = 1;
         const int CancellationRequested = 1 << 1;
 
-//#if NETSTANDARD21
-        
-//#else
+        //#if NETSTANDARD2_1
+        //https://blog.51cto.com/u_10006690/2726859
+        //#else
         protected TaskCompletionSource Promise;
 //#endif
         protected AbstractScheduledEventExecutor Executor;
@@ -34,7 +34,7 @@ namespace DotNetty.Common.Concurrency
             this.action = action;
         }
 
-        public ReusableScheduledTask Reset(AbstractScheduledEventExecutor executor, PreciseTimeSpan deadline)
+        internal ReusableScheduledTask Reset(AbstractScheduledEventExecutor executor, PreciseTimeSpan deadline)
         {
             this.volatileCancellationState = 0;
             this.Executor = executor;
@@ -47,6 +47,9 @@ namespace DotNetty.Common.Concurrency
 
         public bool Cancel()
         {
+            if (this.Executor == null)
+                return false;
+
             if (!this.AtomicCancellationStateUpdate(CancellationRequested, CancellationProhibited))
             {
                 return false;

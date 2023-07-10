@@ -21,11 +21,9 @@ namespace Echo.Client
         public override void ChannelRead(IChannelHandlerContext context, object message)
         {
             var byteBuffer = message as IByteBuffer;
-            if (byteBuffer != null)
-            {
-                UnityEngine.Debug.LogFormat("Received from server: {0}", byteBuffer.ToString(Encoding.UTF8));
-            }
+            UnityEngine.Debug.LogFormat("Received from server: {0}", byteBuffer.ToString(Encoding.UTF8));
 
+            byteBuffer.Release();
             //context.WriteAsync(message);
         }
 
