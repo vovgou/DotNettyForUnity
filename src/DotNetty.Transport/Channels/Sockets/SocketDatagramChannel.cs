@@ -75,6 +75,7 @@ namespace DotNetty.Transport.Channels.Sockets
             try
             {
                 this.Socket.Connect(remoteAddress);
+                this.SetState(StateFlags.Active);
                 success = true;
                 return true;
             }

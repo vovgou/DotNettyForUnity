@@ -320,7 +320,7 @@
         </member>
         <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleAtFixedRate(System.Action,System.TimeSpan,System.TimeSpan)">
             <summary>
-            
+                Schedules the given action for execution at a fixed frequency after the specified delay would pass.
             </summary>
             <param name="action"></param>
             <param name="initialDelay"></param>
@@ -329,7 +329,7 @@
         </member>
         <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleAtFixedRate(DotNetty.Common.Concurrency.IRunnable,System.TimeSpan,System.TimeSpan)">
             <summary>
-            
+                Schedules the given action for execution at a fixed frequency after the specified delay would pass.
             </summary>
             <param name="action"></param>
             <param name="initialDelay"></param>
@@ -338,7 +338,7 @@
         </member>
         <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleWithFixedDelay(System.Action,System.TimeSpan,System.TimeSpan)">
             <summary>
-            
+                Schedules the given action for execution at a fixed delay after the specified delay would pass.
             </summary>
             <param name="action"></param>
             <param name="initialDelay"></param>
@@ -347,7 +347,7 @@
         </member>
         <member name="M:DotNetty.Common.Concurrency.IScheduledExecutorService.ScheduleWithFixedDelay(DotNetty.Common.Concurrency.IRunnable,System.TimeSpan,System.TimeSpan)">
             <summary>
-            
+                Schedules the given action for execution at a fixed delay after the specified delay would pass.
             </summary>
             <param name="action"></param>
             <param name="initialDelay"></param>
@@ -409,6 +409,11 @@
                 an action against different objects in different context is needed.
                 <para>Threading specifics are determined by <c>IEventExecutor</c> implementation.</para>
             </remarks>
+        </member>
+        <member name="T:DotNetty.Common.Concurrency.ReusableScheduledTask">
+            <summary>
+            Reuse ReusableScheduledTask to optimize GC.
+            </summary>
         </member>
         <member name="T:DotNetty.Common.Concurrency.SingleThreadEventExecutor">
             <summary>
