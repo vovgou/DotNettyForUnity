@@ -1,8 +1,0 @@
-﻿<linker>
-	<assembly fullname="DotNetty.Buffers" />
-	<assembly fullname="DotNetty.Codecs" />
-	<assembly fullname="DotNetty.Common" />
-	<assembly fullname="DotNetty.Handlers" />
-	<assembly fullname="DotNetty.Transport" />
-	<assembly fullname="System.Runtime.CompilerServices.Unsafe" />
-</linker>

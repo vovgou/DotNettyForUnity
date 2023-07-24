@@ -3,6 +3,8 @@
 
 namespace DotNetty.Common.Concurrency
 {
+    using DotNetty.Common.Internal;
+    using DotNetty.Common.Internal.Logging;
     using System;
     using System.Collections.Concurrent;
     using System.Threading;
@@ -10,12 +12,20 @@ namespace DotNetty.Common.Concurrency
 
     public abstract class AbstractExecutorService : IExecutorService
     {
-        private const int POOL_CAPACITY = 128;
-        private ActionTaskQueueNodePool actionTaskQueueNodeFactory = new ActionTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+        static readonly IInternalLogger Logger = InternalLoggerFactory.GetInstance<AbstractExecutorService>();
+        static readonly int DefaultTaskNodePoolSize;
+        static AbstractExecutorService()
+        {
+            DefaultTaskNodePoolSize = SystemPropertyUtil.GetInt("io.netty.executor.taskNodePoolSize", 128);
+            if(Logger.DebugEnabled)
+                Logger.Debug("-Dio.netty.executor.taskNodePoolSize: {}", DefaultTaskNodePoolSize);
+        }
 
-        private StateActionTaskQueueNodePool stateActionTaskQueueNodeFactory = new StateActionTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+        private ActionTaskQueueNodePool actionTaskQueueNodeFactory = new ActionTaskQueueNodePool(DefaultTaskNodePoolSize);//Use object pool to optimize GC. by Clark
 
-        private StateActionWithContextTaskQueueNodePool stateActionWithContextTaskQueueNodeFactory = new StateActionWithContextTaskQueueNodePool(POOL_CAPACITY);//Use object pool to optimize GC. by Clark
+        private StateActionTaskQueueNodePool stateActionTaskQueueNodeFactory = new StateActionTaskQueueNodePool(DefaultTaskNodePoolSize);//Use object pool to optimize GC. by Clark
+
+        private StateActionWithContextTaskQueueNodePool stateActionWithContextTaskQueueNodeFactory = new StateActionWithContextTaskQueueNodePool(DefaultTaskNodePoolSize);//Use object pool to optimize GC. by Clark
 
         /// <inheritdoc cref="IExecutorService"/>
         public abstract bool IsShutdown { get; }
