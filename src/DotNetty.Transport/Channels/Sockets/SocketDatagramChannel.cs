@@ -229,13 +229,14 @@ namespace DotNetty.Transport.Channels.Sockets
             else if (msg is IByteBuffer)
             {
                 data = (IByteBuffer)msg;
-                remoteAddress = this.RemoteAddressInternal;
+                remoteAddress = null;// this.RemoteAddressInternal;
             }
 
-            if (data == null || remoteAddress == null)
-            {
-                return false;
-            }
+            ////if (data == null || remoteAddress == null)
+            //if (data == null)
+            //{
+            //    return false;
+            //}
 
             int length = data.ReadableBytes;
             if (length == 0)
@@ -244,7 +245,9 @@ namespace DotNetty.Transport.Channels.Sockets
             }
 
             ArraySegment<byte> bytes = data.GetIoBuffer(data.ReaderIndex, length);
-            int writtenBytes = this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
+            //On the MAC OS X system, an exception that the socket has been connected will be thrown.
+            //int writtenBytes = this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
+            int writtenBytes = (remoteAddress == null || remoteAddress.Equals(RemoteAddressInternal)) ? this.Socket.Send(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None) : this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
 
             return writtenBytes > 0;
         }
