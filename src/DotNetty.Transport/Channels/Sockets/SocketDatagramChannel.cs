@@ -196,7 +196,9 @@ namespace DotNetty.Transport.Channels.Sockets
             SocketChannelAsyncOperation operation = this.PrepareWriteOperation(data.GetIoBuffer(data.ReaderIndex, length));
             operation.RemoteEndPoint = envelope.Recipient;
             this.SetState(StateFlags.WriteScheduled);
-            bool pending = this.Socket.SendToAsync(operation);
+            //On the MAC OS X system, an exception that the socket has been connected will be thrown.
+            //bool pending = this.Socket.SendToAsync(operation);
+            bool pending = (operation.RemoteEndPoint == null || operation.RemoteEndPoint.Equals(RemoteAddressInternal)) ? this.Socket.SendAsync(operation) : this.Socket.SendToAsync(operation);
             if (!pending)
             {
                 ((ISocketChannelUnsafe)this.Unsafe).FinishWrite(operation);
