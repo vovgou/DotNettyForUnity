@@ -623,7 +623,7 @@ namespace DotNetty.Handlers.Tls
             finally
             {
                 // We may have written some parts of data before an exception was thrown so ensure we always flush.
-                context.Flush();
+                context.Flush(); 
             }
         }
 
@@ -682,6 +682,15 @@ namespace DotNetty.Handlers.Tls
 
         void FinishWrap(byte[] buffer, int offset, int count)
         {
+            var executor = this.capturedContext.Executor;
+            if (executor.InEventLoop)
+                DoFinishWrap(buffer, offset, count,false);
+            else
+                executor.Execute(()=> DoFinishWrap(buffer, offset, count,true));
+        }
+
+        void DoFinishWrap(byte[] buffer, int offset, int count,bool flush)
+        {
             IByteBuffer output;
             if (count == 0)
             {
@@ -692,11 +701,27 @@ namespace DotNetty.Handlers.Tls
                 output = this.capturedContext.Allocator.Buffer(count);
                 output.WriteBytes(buffer, offset, count);
             }
-
-            this.lastContextWriteTask = this.capturedContext.WriteAsync(output);
+            if(!flush)
+                this.lastContextWriteTask = this.capturedContext.WriteAsync(output);
+            else
+                this.lastContextWriteTask = this.capturedContext.WriteAndFlushAsync(output);            
         }
 
-        Task FinishWrapNonAppDataAsync(byte[] buffer, int offset, int count)
+        async Task FinishWrapNonAppDataAsync(byte[] buffer, int offset, int count)
+        {
+            var executor = this.capturedContext.Executor;
+            if (executor.InEventLoop)
+            {
+                await DoFinishWrapNonAppDataAsync(buffer, offset, count);
+            }
+            else
+            {
+                Task task = executor.SubmitAsync(()=> DoFinishWrapNonAppDataAsync(buffer,offset,count));
+                await task;
+            }
+        }
+
+        Task DoFinishWrapNonAppDataAsync(byte[] buffer, int offset, int count)
         {
             var future = this.capturedContext.WriteAndFlushAsync(Unpooled.WrappedBuffer(buffer, offset, count));
             this.ReadIfNeeded(this.capturedContext);
