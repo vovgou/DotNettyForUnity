@@ -7,17 +7,31 @@ namespace DotNetty.Buffers
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using DotNetty.Common;
     using DotNetty.Common.Internal;
 
     sealed class PooledHeapByteBuffer : PooledByteBuffer<byte[]>
     {
+        static readonly ThreadLocalPool<PooledHeapByteBuffer> Recycler = new ThreadLocalPool<PooledHeapByteBuffer>(handle => new PooledHeapByteBuffer(handle));
         internal static PooledHeapByteBuffer NewInstance(int maxCapacity)
         {
-            return new PooledHeapByteBuffer(maxCapacity);
+            PooledHeapByteBuffer buffer = Recycler.Take();
+            buffer.SetMaxCapacity(maxCapacity);
+            buffer.SetIndex0(0, 0); 
+            buffer.SetReferenceCount(1);
+            buffer.MarkIndex();
+            return buffer;
+
+            //return new PooledHeapByteBuffer(maxCapacity);
         }
 
-        internal PooledHeapByteBuffer(int maxCapacity)
-            : base(maxCapacity)
+        //internal PooledHeapByteBuffer(int maxCapacity)
+        //    : base(maxCapacity)
+        //{
+        //}
+
+        PooledHeapByteBuffer(ThreadLocalPool.Handle handle)
+        : base(handle)
         {
         }
 

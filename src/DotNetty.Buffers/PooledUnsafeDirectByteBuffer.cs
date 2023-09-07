@@ -3,6 +3,7 @@
 
 namespace DotNetty.Buffers
 {
+    using DotNetty.Common;
     using System;
     using System.IO;
     using System.Runtime.CompilerServices;
@@ -11,15 +12,28 @@ namespace DotNetty.Buffers
 
     sealed unsafe class PooledUnsafeDirectByteBuffer : PooledByteBuffer<byte[]>
     {
+        static readonly ThreadLocalPool<PooledUnsafeDirectByteBuffer> Recycler = new ThreadLocalPool<PooledUnsafeDirectByteBuffer>(handle => new PooledUnsafeDirectByteBuffer(handle));
         byte* memoryAddress;
 
         internal static PooledUnsafeDirectByteBuffer NewInstance(int maxCapacity)
         {
-            return new PooledUnsafeDirectByteBuffer(maxCapacity);
+            PooledUnsafeDirectByteBuffer buffer = Recycler.Take();
+            buffer.SetMaxCapacity(maxCapacity);
+            buffer.SetIndex0(0, 0);
+            buffer.SetReferenceCount(1);
+            buffer.MarkIndex();
+            return buffer;
+
+            //return new PooledUnsafeDirectByteBuffer(maxCapacity);
         }
 
-        PooledUnsafeDirectByteBuffer(int maxCapacity)
-            : base(maxCapacity)
+        //PooledUnsafeDirectByteBuffer(int maxCapacity)
+        //    : base(maxCapacity)
+        //{
+        //}
+
+        PooledUnsafeDirectByteBuffer(ThreadLocalPool.Handle handle)
+       : base(handle)
         {
         }
 

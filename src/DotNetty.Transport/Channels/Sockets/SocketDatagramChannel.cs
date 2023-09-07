@@ -26,7 +26,7 @@ namespace DotNetty.Transport.Channels.Sockets
 
         readonly DefaultDatagramChannelConfig config;
         readonly IPEndPoint anyRemoteEndPoint;
-
+        bool connectedToRemote = false;
         public SocketDatagramChannel()
             : this(new Socket(SocketType.Dgram, ProtocolType.Udp))
         {
@@ -71,17 +71,17 @@ namespace DotNetty.Transport.Channels.Sockets
                 this.DoBind(localAddress);
             }
 
-            bool success = false;
+            connectedToRemote = false;
             try
             {
                 this.Socket.Connect(remoteAddress);
                 this.SetState(StateFlags.Active);
-                success = true;
+                connectedToRemote = true;
                 return true;
             }
             finally
             {
-                if (!success)
+                if (!connectedToRemote)
                 {
                     this.DoClose();
                 }
@@ -99,6 +99,7 @@ namespace DotNetty.Transport.Channels.Sockets
         {
             if (this.TryResetState(StateFlags.Open | StateFlags.Active))
             {
+                this.connectedToRemote = false;
                 this.Socket.Dispose();
             }
         }
@@ -198,7 +199,7 @@ namespace DotNetty.Transport.Channels.Sockets
             this.SetState(StateFlags.WriteScheduled);
             //On the MAC OS X system, an exception that the socket has been connected will be thrown.
             //bool pending = this.Socket.SendToAsync(operation);
-            bool pending = (operation.RemoteEndPoint == null || operation.RemoteEndPoint.Equals(RemoteAddressInternal)) ? this.Socket.SendAsync(operation) : this.Socket.SendToAsync(operation);
+            bool pending = (operation.RemoteEndPoint == null || (connectedToRemote && operation.RemoteEndPoint.Equals(RemoteAddress))) ? this.Socket.SendAsync(operation) : this.Socket.SendToAsync(operation);
             if (!pending)
             {
                 ((ISocketChannelUnsafe)this.Unsafe).FinishWrite(operation);
@@ -249,7 +250,7 @@ namespace DotNetty.Transport.Channels.Sockets
             ArraySegment<byte> bytes = data.GetIoBuffer(data.ReaderIndex, length);
             //On the MAC OS X system, an exception that the socket has been connected will be thrown.
             //int writtenBytes = this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
-            int writtenBytes = (remoteAddress == null || remoteAddress.Equals(RemoteAddressInternal)) ? this.Socket.Send(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None) : this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
+            int writtenBytes = (remoteAddress == null || (connectedToRemote && remoteAddress.Equals(RemoteAddress))) ? this.Socket.Send(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None) : this.Socket.SendTo(bytes.Array, bytes.Offset, bytes.Count, SocketFlags.None, remoteAddress);
 
             return writtenBytes > 0;
         }

@@ -272,6 +272,12 @@ namespace DotNetty.Buffers
             return ToLeakAwareBuffer(buf);
         }
 
+        public override CompositeByteBuffer CompositeHeapBuffer(int maxNumComponents) =>
+          ToLeakAwareBuffer(PooledCompositeByteBuffer.NewInstance(this, false, maxNumComponents));
+
+        public unsafe override CompositeByteBuffer CompositeDirectBuffer(int maxNumComponents) =>
+          ToLeakAwareBuffer(PooledCompositeByteBuffer.NewInstance(this, true, maxNumComponents));
+
         public static bool DefaultPreferDirect => PlatformDependent.DirectBufferPreferred;
 
         public override bool IsDirectBufferPooled => this.directArenas != null;

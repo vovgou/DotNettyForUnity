@@ -19,7 +19,6 @@ namespace DotNetty.Buffers
             duplicate.Init<PooledDuplicatedByteBuffer>(unwrapped, wrapped, readerIndex, writerIndex, unwrapped.MaxCapacity);
             duplicate.MarkReaderIndex();
             duplicate.MarkWriterIndex();
-
             return duplicate;
         }
 

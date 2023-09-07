@@ -6,10 +6,12 @@ namespace DotNetty.Buffers
     using System;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using DotNetty.Common;
     using DotNetty.Common.Utilities;
 
     abstract class PooledByteBuffer<T> : AbstractReferenceCountedByteBuffer
     {
+        readonly ThreadLocalPool.Handle recyclerHandle;
         protected internal PoolChunk<T> Chunk;
         protected internal long Handle;
         protected internal T Memory;
@@ -19,10 +21,16 @@ namespace DotNetty.Buffers
         internal PoolThreadCache<T> Cache;
         PooledByteBufferAllocator allocator;
 
-        protected PooledByteBuffer(int maxCapacity)
-            : base(maxCapacity)
+        protected PooledByteBuffer(ThreadLocalPool.Handle recyclerHandle)
+        : base(0)
         {
+            this.recyclerHandle = recyclerHandle;
         }
+
+        //protected PooledByteBuffer(int maxCapacity)
+        //    : base(maxCapacity)
+        //{
+        //}
 
         internal virtual void Init(PoolChunk<T> chunk, long handle, int offset, int length, int maxLength, PoolThreadCache<T> cache) =>
             this.Init0(chunk, handle, offset, length, maxLength, cache);
@@ -125,12 +133,13 @@ namespace DotNetty.Buffers
         protected internal sealed override void Deallocate()
         {
             if (this.Handle >= 0)
-            {
+            {               
                 long handle = this.Handle;
                 this.Handle = -1;
                 this.Memory = default(T);
                 this.Chunk.Arena.Free(this.Chunk, handle, this.MaxLength, this.Cache);
                 this.Chunk = null;
+                this.recyclerHandle.Release(this);
             }
         }
 

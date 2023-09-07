@@ -32,17 +32,19 @@ namespace DotNetty.Buffers
             {
                 this.Buffer = buffer;
                 this.Length = buffer.ReadableBytes;
+                this.Offset = 0;
+                this.EndOffset = 0;
             }
 
             public void FreeIfNecessary() => this.Buffer.Release();
         }
 
         static readonly ArraySegment<byte> EmptyNioBuffer = Unpooled.Empty.GetIoBuffer();
-
-        readonly IByteBufferAllocator allocator;
-        readonly bool direct;
-        readonly List<ComponentEntry> components;
-        readonly int maxNumComponents;
+        readonly ThreadLocalPool.Handle recyclerHandle;
+        IByteBufferAllocator allocator;
+        bool direct;
+        List<ComponentEntry> components;
+        int maxNumComponents;
 
         bool freed;
 
@@ -106,6 +108,26 @@ namespace DotNetty.Buffers
             this.direct = false;
             this.maxNumComponents = 0;
             this.components = new List<ComponentEntry>(0);
+        }
+
+        internal CompositeByteBuffer(ThreadLocalPool.Handle recyclerHandle) : base(int.MaxValue)
+        {
+            this.recyclerHandle = recyclerHandle;
+        }
+
+        internal void Init(IByteBufferAllocator allocator, bool direct, int maxNumComponents)
+        {
+            this.allocator = allocator;
+            this.direct = direct;
+            this.maxNumComponents = maxNumComponents;
+            if (this.components == null)
+                this.components = NewList(maxNumComponents);
+            else
+                this.components.Clear();
+            this.SetIndex0(0, 0);
+            this.SetReferenceCount(1);
+            this.MarkIndex();
+            this.freed = false;
         }
 
         /// <summary>
@@ -181,7 +203,8 @@ namespace DotNetty.Buffers
                 int readableBytes = buffer.ReadableBytes;
 
                 // No need to consolidate - just add a component to the list.
-                var c = new ComponentEntry(buffer.Slice());
+                //var c = new ComponentEntry(buffer.Slice());
+                var c = new ComponentEntry(buffer.RetainedSlice());//有GC，需要处理
                 if (cIndex == this.components.Count)
                 {
                     this.components.Add(c);
@@ -214,10 +237,11 @@ namespace DotNetty.Buffers
             }
             finally
             {
-                if (!wasAdded)
-                {
-                    buffer.Release();
-                }
+                buffer.Release();
+                //if (!wasAdded)
+                //{
+                //    buffer.Release();
+                //}
             }
         }
 
@@ -1492,6 +1516,9 @@ namespace DotNetty.Buffers
             {
                 this.components[i].FreeIfNecessary();
             }
+
+            if(recyclerHandle!=null)
+                this.recyclerHandle.Release(this);
         }
 
         public override IByteBuffer Unwrap() => null;

@@ -88,7 +88,7 @@ namespace DotNetty.Buffers
         public sealed override IByteBuffer RetainedSlice()
         {
             int index = this.ReaderIndex;
-            return base.RetainedSlice(index, this.WriterIndex - index);
+            return RetainedSlice(index, this.WriterIndex - index);
         }
 
         public override IByteBuffer Slice(int index, int length)
