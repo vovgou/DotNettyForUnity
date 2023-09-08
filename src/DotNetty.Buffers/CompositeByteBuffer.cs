@@ -23,12 +23,27 @@ namespace DotNetty.Buffers
 
         class ComponentEntry
         {
-            public readonly IByteBuffer Buffer;
-            public readonly int Length;
+            static readonly ThreadLocalPool<ComponentEntry> Pool = new ThreadLocalPool<ComponentEntry>(h => new ComponentEntry(h));
+
+            public static ComponentEntry NewInstance(IByteBuffer buffer)
+            {
+                ComponentEntry entry = Pool.Take();
+                entry.Init(buffer);
+                return entry;
+            }
+
+            readonly ThreadLocalPool.Handle handle;
+            public IByteBuffer Buffer;
+            public int Length;
             public int Offset;
             public int EndOffset;
 
-            public ComponentEntry(IByteBuffer buffer)
+            ComponentEntry(ThreadLocalPool.Handle handle)
+            {
+                this.handle = handle;
+            }
+
+            private void Init(IByteBuffer buffer)
             {
                 this.Buffer = buffer;
                 this.Length = buffer.ReadableBytes;
@@ -36,7 +51,26 @@ namespace DotNetty.Buffers
                 this.EndOffset = 0;
             }
 
-            public void FreeIfNecessary() => this.Buffer.Release();
+            public void Recycle()
+            {
+                ReferenceCountUtil.SafeRelease(this.Buffer);
+                this.Buffer = null;
+                this.Length = 0;
+                this.Offset = 0;
+                this.EndOffset = 0;
+                if (this.handle != null)
+                    this.handle.Release(this);
+            }
+
+            //public ComponentEntry(IByteBuffer buffer)
+            //{
+            //    this.Buffer = buffer;
+            //    this.Length = buffer.ReadableBytes;
+            //    this.Offset = 0;
+            //    this.EndOffset = 0;
+            //}
+
+            //public void FreeIfNecessary() => this.Buffer.Release();
         }
 
         static readonly ArraySegment<byte> EmptyNioBuffer = Unpooled.Empty.GetIoBuffer();
@@ -195,7 +229,7 @@ namespace DotNetty.Buffers
 
         int AddComponent0(bool increaseWriterIndex, int cIndex, IByteBuffer buffer)
         {
-            bool wasAdded = false;
+            //bool wasAdded = false;
             try
             {
                 this.CheckComponentIndex(cIndex);
@@ -204,11 +238,12 @@ namespace DotNetty.Buffers
 
                 // No need to consolidate - just add a component to the list.
                 //var c = new ComponentEntry(buffer.Slice());
-                var c = new ComponentEntry(buffer.RetainedSlice());//有GC，需要处理
+                //var c = new ComponentEntry(buffer.RetainedSlice());//有GC，需要处理
+                var c = ComponentEntry.NewInstance(buffer.RetainedSlice());//优化GC
                 if (cIndex == this.components.Count)
                 {
                     this.components.Add(c);
-                    wasAdded = true;
+                    //wasAdded = true;
                     if (cIndex == 0)
                     {
                         c.EndOffset = readableBytes;
@@ -223,7 +258,7 @@ namespace DotNetty.Buffers
                 else
                 {
                     this.components.Insert(cIndex, c);
-                    wasAdded = true;
+                    //wasAdded = true;
                     if (readableBytes != 0)
                     {
                         this.UpdateComponentOffsets(cIndex);
@@ -356,11 +391,12 @@ namespace DotNetty.Buffers
                     ComponentEntry c1 = this.components[i];
                     IByteBuffer b = c1.Buffer;
                     consolidated.WriteBytes(b);
-                    c1.FreeIfNecessary();
+                    c1.Recycle();
                 }
-                var c = new ComponentEntry(consolidated);
-                c.EndOffset = c.Length;
                 this.components.Clear();
+
+                var c = ComponentEntry.NewInstance(consolidated);
+                c.EndOffset = c.Length;
                 this.components.Add(c);
             }
         }
@@ -416,9 +452,10 @@ namespace DotNetty.Buffers
         {
             this.CheckComponentIndex(cIndex);
             ComponentEntry comp = this.components[cIndex];
+            int length = comp.Length;
             this.components.RemoveAt(cIndex);
-            comp.FreeIfNecessary();
-            if (comp.Length > 0)
+            comp.Recycle();
+            if (length > 0)
             {
                 // Only need to call updateComponentOffsets if the length was > 0
                 this.UpdateComponentOffsets(cIndex);
@@ -444,8 +481,8 @@ namespace DotNetty.Buffers
             {
                 ComponentEntry c = this.components[i];
                 needsUpdate |= c.Length > 0;
-                c.FreeIfNecessary();
                 this.components.RemoveAt(i);
+                c.Recycle();
             }
 
             if (needsUpdate)
@@ -765,14 +802,16 @@ namespace DotNetty.Buffers
                     {
                         bytesToTrim -= c.Length;
                         this.components.RemoveAt(i);
+                        c.Recycle();
                         continue;
                     }
 
                     // Replace the last component with the trimmed slice.
-                    var newC = new ComponentEntry(c.Buffer.Slice(0, c.Length - bytesToTrim));
+                    var newC = ComponentEntry.NewInstance(c.Buffer.RetainedSlice(0, c.Length - bytesToTrim));
                     newC.Offset = c.Offset;
                     newC.EndOffset = newC.Offset + newC.Length;
                     this.components[i] = newC;
+                    c.Recycle();
                     break;
                 }
 
@@ -1340,8 +1379,7 @@ namespace DotNetty.Buffers
                 return this;
             }
 
-            ComponentEntry last = this.components[numComponents - 1];
-            int capacity = last.EndOffset;
+            int capacity = components[numComponents - 1].EndOffset;
             IByteBuffer consolidated = this.AllocateBuffer(capacity);
 
             for (int i = 0; i < numComponents; i++)
@@ -1349,11 +1387,10 @@ namespace DotNetty.Buffers
                 ComponentEntry c = this.components[i];
                 IByteBuffer b = c.Buffer;
                 consolidated.WriteBytes(b);
-                c.FreeIfNecessary();
+                c.Recycle();
             }
-
             this.components.Clear();
-            this.components.Add(new ComponentEntry(consolidated));
+            this.components.Add(ComponentEntry.NewInstance(consolidated));
             this.UpdateComponentOffsets(0);
             return this;
         }
@@ -1381,11 +1418,10 @@ namespace DotNetty.Buffers
                 ComponentEntry c = this.components[i];
                 IByteBuffer b = c.Buffer;
                 consolidated.WriteBytes(b);
-                c.FreeIfNecessary();
+                c.Recycle();
             }
-
             this.components.RemoveRange(cIndex, numComponents);
-            this.components.Insert(cIndex,new ComponentEntry(consolidated));
+            this.components.Insert(cIndex, ComponentEntry.NewInstance(consolidated));
             this.UpdateComponentOffsets(cIndex);
             return this;
         }
@@ -1408,7 +1444,7 @@ namespace DotNetty.Buffers
             {
                 foreach (ComponentEntry c in this.components)
                 {
-                    c.FreeIfNecessary();
+                    c.Recycle();
                 }
                 this.components.Clear();
                 this.SetIndex(0, 0);
@@ -1420,7 +1456,7 @@ namespace DotNetty.Buffers
             int firstComponentId = this.ToComponentIndex(readerIndex);
             for (int i = 0; i < firstComponentId; i++)
             {
-                this.components[i].FreeIfNecessary();
+                this.components[i].Recycle();
             }
             this.components.RemoveRange(0, firstComponentId);
 
@@ -1448,7 +1484,7 @@ namespace DotNetty.Buffers
             {
                 foreach (ComponentEntry c1 in this.components)
                 {
-                    c1.FreeIfNecessary();
+                    c1.Recycle();
                 }
                 this.components.Clear();
                 this.SetIndex(0, 0);
@@ -1460,7 +1496,7 @@ namespace DotNetty.Buffers
             int firstComponentId = this.ToComponentIndex(readerIndex);
             for (int i = 0; i < firstComponentId; i++)
             {
-                this.components[i].FreeIfNecessary();
+                this.components[i].Recycle();
             }
             this.components.RemoveRange(0, firstComponentId);
 
@@ -1474,9 +1510,10 @@ namespace DotNetty.Buffers
             }
             else
             {
-                var newC = new ComponentEntry(c.Buffer.Slice(adjustment, c.Length - adjustment));
+                var newC = ComponentEntry.NewInstance(c.Buffer.RetainedSlice(adjustment, c.Length - adjustment));
                 this.components[0] = newC;
             }
+            c.Recycle();
 
             // Update indexes and markers.
             this.UpdateComponentOffsets(0);
@@ -1485,7 +1522,7 @@ namespace DotNetty.Buffers
             return this;
         }
 
-        IByteBuffer AllocateBuffer(int capacity) => 
+        IByteBuffer AllocateBuffer(int capacity) =>
             this.direct ? this.Allocator.DirectBuffer(capacity) : this.Allocator.HeapBuffer(capacity);
 
         public override string ToString()
@@ -1514,10 +1551,10 @@ namespace DotNetty.Buffers
             // see https://github.com/netty/netty/issues/2642
             for (int i = 0; i < size; i++)
             {
-                this.components[i].FreeIfNecessary();
+                this.components[i].Recycle();
             }
 
-            if(recyclerHandle!=null)
+            if (recyclerHandle != null)
                 this.recyclerHandle.Release(this);
         }
 

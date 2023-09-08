@@ -119,20 +119,22 @@ namespace DotNetty.Transport.Channels.Sockets
 
             bool pending;
 #if NETSTANDARD2_0 || NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
-            pending = this.Socket.ReceiveFromAsync(operation);
+            pending = connectedToRemote ? this.Socket.ReceiveAsync(operation) : this.Socket.ReceiveFromAsync(operation);
 #else
             if (ExecutionContext.IsFlowSuppressed())
             {
-                pending = this.Socket.ReceiveFromAsync(operation);
+                pending = connectedToRemote ? this.Socket.ReceiveAsync(operation) : this.Socket.ReceiveFromAsync(operation);
             }
             else
             {
                 using (ExecutionContext.SuppressFlow())
                 {
-                    pending = this.Socket.ReceiveFromAsync(operation);
+                    pending = connectedToRemote ? this.Socket.ReceiveAsync(operation) : this.Socket.ReceiveFromAsync(operation);
                 }
             }
 #endif
+
+
             if (!pending)
             {
                 this.EventLoop.Execute(ReceiveFromCompletedSyncCallback, this.Unsafe, operation);
@@ -159,8 +161,8 @@ namespace DotNetty.Transport.Channels.Sockets
 
                 handle.LastBytesRead = received;
                 data.SetWriterIndex(data.WriterIndex + received);
-                EndPoint remoteAddress = operation.RemoteEndPoint;
-                buf.Add(new DatagramPacket(data, remoteAddress, this.LocalAddress));
+                EndPoint remoteAddress = connectedToRemote ? RemoteAddress : operation.RemoteEndPoint;
+                buf.Add(DatagramPacket.NewInstance(data, remoteAddress, this.LocalAddress));
                 free = false;
 
                 return 1;
@@ -262,7 +264,7 @@ namespace DotNetty.Transport.Channels.Sockets
             {
                 return IsSingleBuffer(packet.Content)
                     ? packet
-                    : new DatagramPacket(this.CreateNewDirectBuffer(packet, packet.Content), packet.Recipient);
+                    : DatagramPacket.NewInstance(this.CreateNewDirectBuffer(packet, packet.Content), packet.Recipient);
             }
 
             var buffer = msg as IByteBuffer;
@@ -281,7 +283,7 @@ namespace DotNetty.Transport.Channels.Sockets
                     return envolope;
                 }
 
-                return new DefaultAddressedEnvelope<IByteBuffer>(
+                return DefaultAddressedEnvelope<IByteBuffer>.NewInstance(
                     this.CreateNewDirectBuffer(envolope, envolope.Content), envolope.Recipient);
             }
 

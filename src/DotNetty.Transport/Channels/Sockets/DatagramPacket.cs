@@ -7,8 +7,26 @@ namespace DotNetty.Transport.Channels.Sockets
     using DotNetty.Buffers;
     using DotNetty.Common;
 
-    public sealed class DatagramPacket : DefaultAddressedEnvelope<IByteBuffer>, IByteBufferHolder
+    public class DatagramPacket : DefaultAddressedEnvelope<IByteBuffer>, IByteBufferHolder
     {
+        static readonly ThreadLocalPool<DatagramPacket> Recycler = new ThreadLocalPool<DatagramPacket>(h => new DatagramPacket(h));
+
+        public static new DatagramPacket NewInstance(IByteBuffer content, EndPoint recipient)
+        {
+            return NewInstance(content, null, recipient);
+        }
+
+        public static new DatagramPacket NewInstance(IByteBuffer content, EndPoint sender, EndPoint recipient)
+        {
+            DatagramPacket packet = Recycler.Take();
+            packet.Init(content, sender, recipient);
+            return packet;
+        }
+
+        DatagramPacket(ThreadLocalPool.Handle handle) : base(handle)
+        {
+        }
+
         public DatagramPacket(IByteBuffer message, EndPoint recipient)
             : base(message, recipient)
         {
@@ -19,36 +37,53 @@ namespace DotNetty.Transport.Channels.Sockets
         {
         }
 
-        public IByteBufferHolder Copy() => new DatagramPacket(this.Content.Copy(), this.Sender, this.Recipient);
+        public virtual IByteBufferHolder Copy() => NewInstance(this.Content.Copy(), this.Sender, this.Recipient);
 
-        public IByteBufferHolder Duplicate() => new DatagramPacket(this.Content.Duplicate(), this.Sender, this.Recipient);
+        public virtual IByteBufferHolder Duplicate() => new DuplicateDatagramPacket(this, this.Content.Duplicate(), this.Sender, this.Recipient);
 
-        public IByteBufferHolder RetainedDuplicate() => this.Replace(this.Content.RetainedDuplicate());
+        public virtual IByteBufferHolder RetainedDuplicate() => this.Replace(this.Content.RetainedDuplicate());
 
-        public IByteBufferHolder Replace(IByteBuffer content) => new DatagramPacket(content, this.Recipient, this.Sender);
+        public virtual IByteBufferHolder Replace(IByteBuffer content) => NewInstance(content, this.Recipient, this.Sender);
 
-        public override IReferenceCounted Retain()
+        sealed class DuplicateDatagramPacket : DatagramPacket
         {
-            base.Retain();
-            return this;
-        }
+            private readonly IReferenceCounted referenceCountDelegate;
+            public DuplicateDatagramPacket(IReferenceCounted referenceCountDelegate, IByteBuffer message, EndPoint sender, EndPoint recipient) : base(message, sender, recipient)
+            {
+                this.referenceCountDelegate = referenceCountDelegate;
+            }
 
-        public override IReferenceCounted Retain(int increment)
-        {
-            base.Retain(increment);
-            return this;
-        }
+            public override IByteBufferHolder Duplicate() => new DuplicateDatagramPacket(referenceCountDelegate, this.Content.Duplicate(), this.Sender, this.Recipient);
 
-        public override IReferenceCounted Touch()
-        {
-            base.Touch();
-            return this;
-        }
+            public override int ReferenceCount => this.referenceCountDelegate.ReferenceCount;
 
-        public override IReferenceCounted Touch(object hint)
-        {
-            base.Touch(hint);
-            return this;
+            public override IReferenceCounted Retain()
+            {
+                referenceCountDelegate.Retain();
+                return this;
+            }
+
+            public override IReferenceCounted Retain(int increment)
+            {
+                referenceCountDelegate.Retain(increment);
+                return this;
+            }
+
+            public override IReferenceCounted Touch()
+            {
+                referenceCountDelegate.Touch();
+                return this;
+            }
+
+            public override IReferenceCounted Touch(object hint)
+            {
+                referenceCountDelegate.Touch(hint);
+                return this;
+            }
+
+            public override bool Release() => referenceCountDelegate.Release();
+
+            public override bool Release(int decrement) => referenceCountDelegate.Release(decrement);
         }
     }
 }

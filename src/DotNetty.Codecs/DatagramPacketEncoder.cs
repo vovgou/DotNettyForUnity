@@ -45,7 +45,7 @@ namespace DotNetty.Codecs
             }
 
             // Replace the ByteBuf with a DatagramPacket.
-            output[0] = new DatagramPacket(content, message.Sender, message.Recipient);
+            output[0] = DatagramPacket.NewInstance(content, message.Sender, message.Recipient);
         }
 
         public override Task BindAsync(IChannelHandlerContext context, EndPoint localAddress) => 

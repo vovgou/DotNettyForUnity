@@ -28,7 +28,6 @@ namespace DotNetty.Buffers
             slice.Init<PooledSlicedByteBuffer>(unwrapped, wrapped, 0, length, length);
             slice.DiscardMarks();
             slice.adjustment = adjustment;
-
             return slice;
         }
 
