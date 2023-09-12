@@ -27,6 +27,14 @@ namespace DotNetty.Buffers
             this.recyclerHandle = recyclerHandle;
         }
 
+        protected void Reuse(int maxCapacity)
+        {
+            this.SetMaxCapacity(maxCapacity);
+            this.SetReferenceCount(1);
+            this.SetIndex0(0, 0);
+            this.DiscardMarks();
+        }
+
         //protected PooledByteBuffer(int maxCapacity)
         //    : base(maxCapacity)
         //{

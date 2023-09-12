@@ -16,12 +16,8 @@ namespace DotNetty.Buffers
         internal static PooledHeapByteBuffer NewInstance(int maxCapacity)
         {
             PooledHeapByteBuffer buffer = Recycler.Take();
-            buffer.SetMaxCapacity(maxCapacity);
-            buffer.SetIndex0(0, 0); 
-            buffer.SetReferenceCount(1);
-            buffer.MarkIndex();
+            buffer.Reuse(maxCapacity);
             return buffer;
-
             //return new PooledHeapByteBuffer(maxCapacity);
         }
 

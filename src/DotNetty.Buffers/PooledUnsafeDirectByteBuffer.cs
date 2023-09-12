@@ -18,12 +18,8 @@ namespace DotNetty.Buffers
         internal static PooledUnsafeDirectByteBuffer NewInstance(int maxCapacity)
         {
             PooledUnsafeDirectByteBuffer buffer = Recycler.Take();
-            buffer.SetMaxCapacity(maxCapacity);
-            buffer.SetIndex0(0, 0);
-            buffer.SetReferenceCount(1);
-            buffer.MarkIndex();
+            buffer.Reuse(maxCapacity);
             return buffer;
-
             //return new PooledUnsafeDirectByteBuffer(maxCapacity);
         }
 
@@ -56,14 +52,6 @@ namespace DotNetty.Buffers
         }
 
         public override bool IsDirect => true;
-
-        internal void Reuse(int maxCapacity)
-        {
-            this.SetMaxCapacity(maxCapacity);
-            this.SetReferenceCount(1);
-            this.SetIndex0(0, 0);
-            this.DiscardMarks();
-        }
 
         protected internal override byte _GetByte(int index) => *(this.memoryAddress + index);
 
