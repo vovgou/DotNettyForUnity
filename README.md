@@ -9,6 +9,8 @@ This version is modified based on [DotNetty](https://github.com/Azure/DotNetty)'
 
 ## Fixes & Improvements
 
+ * Removed assemblies System.Collections.Immutable,System.Threading.Tasks.Extensions and Microsoft.Extensions.Logging.
+ * Added the Factory property  to the InternalLoggerFactory to integrate the log printing feature of Unity.
  * Added ScheduleWithFixedDelay and ScheduleAtFixedRate methods for IScheduledExecutorService.
  * Added FixedDelayScheduledTask and FixedRateScheduledTask.
  * Added object pools for ActionTaskQueueNode, StateActionTaskQueueNode, and StateActionWithContextTaskQueueNode, and optimized GC.
