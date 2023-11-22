@@ -669,14 +669,13 @@
             <exception cref="T:System.ArgumentException">Thrown if a <see cref="T:DotNetty.Transport.Channels.ChannelOption"/> for the given <paramref name="name"/> exists.</exception>
             <returns>The new <see cref="T:DotNetty.Transport.Channels.ChannelOption`1"/> instance.</returns>
         </member>
-        <member name="M:DotNetty.Transport.Channels.ChannelOutboundBuffer.AddMessage(System.Object,System.Int32,DotNetty.Common.Concurrency.TaskCompletionSource)">
+        <member name="M:DotNetty.Transport.Channels.ChannelOutboundBuffer.AddMessage(System.Object,System.Int32)">
             <summary>
-            Adds the given message to this <see cref="T:DotNetty.Transport.Channels.ChannelOutboundBuffer"/>. The given
-            <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> will be notified once the message was written.
+            Adds the given message to this <see cref="T:DotNetty.Transport.Channels.ChannelOutboundBuffer"/>. Returned
+            <see cref="T:System.Threading.Tasks.ValueTask"/> will be notified once the message was written.
             </summary>
             <param name="msg">The message to add to the buffer.</param>
             <param name="size">The size of the message.</param>
-            <param name="promise">The <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> to notify once the message is written.</param>
         </member>
         <member name="M:DotNetty.Transport.Channels.ChannelOutboundBuffer.AddFlush">
             <summary>
@@ -2451,6 +2450,11 @@
             <param name="promise">The <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> to complete.</param>
             <param name="logger">The <see cref="T:DotNetty.Common.Internal.Logging.IInternalLogger"/> to use to log a failure message.</param>
         </member>
+        <member name="M:DotNetty.Transport.Channels.Util.SafeSetSuccess(DotNetty.Common.Concurrency.IPromise,DotNetty.Common.Internal.Logging.IInternalLogger)">
+            <summary>
+                Marks the specified {@code promise} as success.  If the {@code promise} is done already, log a message.
+            </summary>
+        </member>
         <member name="M:DotNetty.Transport.Channels.Util.SafeSetFailure(DotNetty.Common.Concurrency.TaskCompletionSource,System.Exception,DotNetty.Common.Internal.Logging.IInternalLogger)">
             <summary>
             Marks the specified <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> as failure. If the
@@ -2459,6 +2463,11 @@
             <param name="promise">The <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> to complete.</param>
             <param name="cause">The <see cref="T:System.Exception"/> to fail the <see cref="T:DotNetty.Common.Concurrency.TaskCompletionSource"/> with.</param>
             <param name="logger">The <see cref="T:DotNetty.Common.Internal.Logging.IInternalLogger"/> to use to log a failure message.</param>
+        </member>
+        <member name="M:DotNetty.Transport.Channels.Util.SafeSetFailure(DotNetty.Common.Concurrency.IPromise,System.Exception,DotNetty.Common.Internal.Logging.IInternalLogger)">
+            <summary>
+                Marks the specified {@code promise} as failure.  If the {@code promise} is done already, log a message.
+            </summary>
         </member>
     </members>
 </doc>

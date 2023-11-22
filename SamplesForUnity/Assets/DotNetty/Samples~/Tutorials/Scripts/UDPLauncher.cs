@@ -13,19 +13,24 @@ public class UDPLauncher : MonoBehaviour
     //EchoClient client;
     EchoUDPClient client;
     IChannel channel;
-    //private string host = "127.0.0.1";
-    //private int port = 8007;
-    //private string host = "127.0.0.1";
-    private string host = "192.168.1.253";
-    private int port = 8800;
+    private string host = "127.0.0.1";
+    private int port = 8007;
     void Start()
     {
         UnityLoggerFactory.Default.Level = Level.DEBUG;
 
+        //Set the following properties to optimize performance and GC
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.leakDetection.level")))
+            Environment.SetEnvironmentVariable("io.netty.leakDetection.level", "Disabled");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.noPreferDirect")))
+            Environment.SetEnvironmentVariable("io.netty.noPreferDirect", "false");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.allocator.maxOrder")))
+            Environment.SetEnvironmentVariable("io.netty.allocator.maxOrder", "9");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.recycler.ratio")))
+            Environment.SetEnvironmentVariable("io.netty.recycler.ratio", "0");
+
         server = new EchoUDPServer(port);
         client = new EchoUDPClient();
-
-        Environment.SetEnvironmentVariable("io.netty.noPreferDirect", "false");
     }
 
 

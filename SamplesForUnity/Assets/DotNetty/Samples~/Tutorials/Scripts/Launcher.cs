@@ -4,6 +4,7 @@ using DotNetty.Transport.Channels;
 using DotNetty.Unity;
 using Echo.Client;
 using Echo.Server;
+using System;
 using System.Text;
 using UnityEngine;
 
@@ -17,6 +18,16 @@ public class Launcher : MonoBehaviour
     void Start()
     {
         UnityLoggerFactory.Default.Level = Level.DEBUG;
+
+        //Set the following properties to optimize performance and GC
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.leakDetection.level")))
+            Environment.SetEnvironmentVariable("io.netty.leakDetection.level", "Disabled");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.noPreferDirect")))
+            Environment.SetEnvironmentVariable("io.netty.noPreferDirect", "false");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.allocator.maxOrder")))
+            Environment.SetEnvironmentVariable("io.netty.allocator.maxOrder", "9");
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("io.netty.recycler.ratio")))
+            Environment.SetEnvironmentVariable("io.netty.recycler.ratio", "0");
 
         server = new EchoServer(port);
         client = new EchoClient();
