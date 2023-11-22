@@ -7,7 +7,6 @@ namespace DotNetty.Transport.Channels
     using System.Threading.Tasks;
     using DotNetty.Common.Concurrency;
     using DotNetty.Common.Internal.Logging;
-    using TaskCompletionSource = DotNetty.Common.Concurrency.TaskCompletionSource;
 
     static class Util
     {
@@ -26,6 +25,17 @@ namespace DotNetty.Transport.Channels
                 logger.Warn($"Failed to mark a promise as success because it is done already: {promise}");
             }
         }
+        
+        /// <summary>
+        ///     Marks the specified {@code promise} as success.  If the {@code promise} is done already, log a message.
+        /// </summary>
+        public static void SafeSetSuccess(IPromise promise, IInternalLogger logger)
+        {
+            if (!promise.TryComplete())
+            {
+                logger.Warn($"Failed to mark a promise as success because it is done already: {promise}");
+            }
+        }
 
         /// <summary>
         /// Marks the specified <see cref="TaskCompletionSource"/> as failure. If the
@@ -37,6 +47,17 @@ namespace DotNetty.Transport.Channels
         public static void SafeSetFailure(TaskCompletionSource promise, Exception cause, IInternalLogger logger)
         {
             if (promise != TaskCompletionSource.Void && !promise.TrySetException(cause))
+            {
+                logger.Warn($"Failed to mark a promise as failure because it's done already: {promise}", cause);
+            }
+        }
+        
+        /// <summary>
+        ///     Marks the specified {@code promise} as failure.  If the {@code promise} is done already, log a message.
+        /// </summary>
+        public static void SafeSetFailure(IPromise promise, Exception cause, IInternalLogger logger)
+        {
+            if (!promise.TrySetException(cause))
             {
                 logger.Warn($"Failed to mark a promise as failure because it's done already: {promise}", cause);
             }

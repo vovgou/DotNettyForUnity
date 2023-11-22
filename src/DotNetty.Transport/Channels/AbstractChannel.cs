@@ -13,7 +13,6 @@ namespace DotNetty.Transport.Channels
     using DotNetty.Common.Concurrency;
     using DotNetty.Common.Internal.Logging;
     using DotNetty.Common.Utilities;
-    using TaskCompletionSource = DotNetty.Common.Concurrency.TaskCompletionSource;
 
     public abstract class AbstractChannel : DefaultAttributeMap, IChannel
     {
@@ -190,9 +189,11 @@ namespace DotNetty.Transport.Channels
             return this;
         }
 
-        public Task WriteAsync(object msg) => this.pipeline.WriteAsync(msg);
+        public ValueTask WriteAsync(object msg) => this.pipeline.WriteAsync(msg);
 
         public Task WriteAndFlushAsync(object message) => this.pipeline.WriteAndFlushAsync(message);
+        
+        public ValueTask WriteAndFlushAsync(object message, bool notifyComplete) => this.pipeline.WriteAndFlushAsync(message, notifyComplete);
 
         public Task CloseCompletion => this.closeFuture.Task;
 
@@ -671,7 +672,7 @@ namespace DotNetty.Transport.Channels
                 }
             }
 
-            public Task WriteAsync(object msg)
+            public ValueTask WriteAsync(object msg)
             {
                 this.AssertEventLoop();
 
@@ -685,7 +686,7 @@ namespace DotNetty.Transport.Channels
 
                     // release message now to prevent resource-leak
                     ReferenceCountUtil.Release(msg);
-                    return TaskEx.FromException(new ClosedChannelException());
+                    return new ClosedChannelException().ToValueTask();
                 }
 
                 int size;
@@ -701,13 +702,10 @@ namespace DotNetty.Transport.Channels
                 catch (Exception t)
                 {
                     ReferenceCountUtil.Release(msg);
-
-                    return TaskEx.FromException(t);
+                    return t.ToValueTask();
                 }
 
-                var promise = new TaskCompletionSource();
-                outboundBuffer.AddMessage(msg, size, promise);
-                return promise.Task;
+                return outboundBuffer.AddMessage(msg, size);
             }
 
             public void Flush()

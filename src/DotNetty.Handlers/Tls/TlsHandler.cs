@@ -13,6 +13,7 @@ namespace DotNetty.Handlers.Tls
     using DotNetty.Buffers;
     using DotNetty.Codecs;
     using DotNetty.Common;
+    using DotNetty.Common.Concurrency;
     using DotNetty.Common.Utilities;
     using DotNetty.Transport.Channels;
     using TaskCompletionSource = DotNetty.Common.Concurrency.TaskCompletionSource;
@@ -593,14 +594,14 @@ namespace DotNetty.Handlers.Tls
             return oldState.Has(TlsHandlerState.Authenticated);
         }
 
-        public override Task WriteAsync(IChannelHandlerContext context, object message)
+        public override ValueTask WriteAsync(IChannelHandlerContext context, object message)
         {
             if (!(message is IByteBuffer))
             {
-                return TaskEx.FromException(new UnsupportedMessageTypeException(message, typeof(IByteBuffer)));
+                return new UnsupportedMessageTypeException(message, typeof(IByteBuffer)).ToValueTask();
             }
 
-            return this.pendingUnencryptedWrites.Add(message);
+            return new ValueTask(this.pendingUnencryptedWrites.Add(message)); // this.pendingUnencryptedWrites.Add(message);
         }
 
         public override void Flush(IChannelHandlerContext context)
@@ -659,7 +660,7 @@ namespace DotNetty.Handlers.Tls
                     buf.ReadBytes(this.sslStream, buf.ReadableBytes); // this leads to FinishWrap being called 0+ times
                     buf.Release();
 
-                    TaskCompletionSource promise = this.pendingUnencryptedWrites.Remove();
+                    IPromise promise = this.pendingUnencryptedWrites.Remove();
                     Task task = this.lastContextWriteTask;
                     if (task != null)
                     {
@@ -702,7 +703,7 @@ namespace DotNetty.Handlers.Tls
                 output.WriteBytes(buffer, offset, count);
             }
             if(!flush)
-                this.lastContextWriteTask = this.capturedContext.WriteAsync(output);
+                this.lastContextWriteTask = this.capturedContext.WriteAsync(output).AsTask();
             else
                 this.lastContextWriteTask = this.capturedContext.WriteAndFlushAsync(output);            
         }

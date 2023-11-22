@@ -38,4 +38,7 @@
     <!--<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />-->
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
   </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)'=='netstandard2.0') Or ('$(TargetFramework)'=='net472')">
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
 </Project>
