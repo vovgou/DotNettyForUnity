@@ -16,10 +16,12 @@ namespace DotNetty.Transport.Channels
     using DotNetty.Common;
     using DotNetty.Common.Concurrency;
     using DotNetty.Common.Internal;
+    using DotNetty.Common.Internal.Logging;
     using DotNetty.Common.Utilities;
 
     abstract class AbstractChannelHandlerContext : IChannelHandlerContext, IResourceLeakHint
     {
+        static readonly IInternalLogger Log = InternalLoggerFactory.GetInstance<AbstractChannelHandlerContext>();
         static readonly Action<object> InvokeChannelReadCompleteAction = ctx => ((AbstractChannelHandlerContext)ctx).InvokeChannelReadComplete();
         static readonly Action<object> InvokeReadAction = ctx => ((AbstractChannelHandlerContext)ctx).InvokeRead();
         static readonly Action<object> InvokeChannelWritabilityChangedAction = ctx => ((AbstractChannelHandlerContext)ctx).InvokeChannelWritabilityChanged();
@@ -74,11 +76,32 @@ namespace DotNetty.Transport.Channels
 
         protected static SkipFlags GetSkipPropagationFlags(IChannelHandler handler)
         {
-            Tuple<SkipFlags> skipDirection = SkipTable.GetValue(
-                handler.GetType(),
-                handlerType => Tuple.Create(CalculateSkipPropagationFlags(handlerType)));
+            try
+            {
+                Tuple<SkipFlags> skipDirection = SkipTable.GetValue(
+                    handler.GetType(),
+                    handlerType => Tuple.Create(CalculateSkipPropagationFlags(handlerType)));
 
-            return skipDirection?.Item1 ?? 0;
+                return skipDirection?.Item1 ?? 0;
+            }catch(InvalidCastException e)
+            {
+                //Occasionally, the type conversion is abnormal, and the reason is not found, so it is handled temporarily.
+                if (Log.ErrorEnabled)
+                    Log.Error(e);
+
+                SkipTable.Remove(handler.GetType());
+                Tuple<SkipFlags> skipDirection = SkipTable.GetValue(
+                   handler.GetType(),
+                   handlerType => Tuple.Create(CalculateSkipPropagationFlags(handlerType)));
+
+                return skipDirection?.Item1 ?? 0;
+            }
+            catch(Exception e)
+            {                
+                if (Log.ErrorEnabled)
+                    Log.Error(e);
+                return 0;
+            }
         }
 
         protected static SkipFlags CalculateSkipPropagationFlags(Type handlerType)
